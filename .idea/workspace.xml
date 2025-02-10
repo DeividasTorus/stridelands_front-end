@@ -5,47 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="794f0234-1534-4e4d-b9fd-79d46cf5ef2e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/(tabs)/_layout.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/(tabs)/index.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/+not-found.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/_layout.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/auth/_layout.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/auth/login.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/auth/register.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/fonts/SpaceMono-Regular.ttf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/StrideLands.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/adaptive-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/barbarian.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/bricksIcon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/cropIcon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/favicon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/goldIcon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/ironIcon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/partial-react-logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/react-logo.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/react-logo@2x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/react-logo@3x.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/splash-icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/villageMap.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/assets/images/woodIcon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/Collapsible.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/ExternalLink.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/HapticTab.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/HelloWave.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/ParallaxScrollView.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/ThemedText.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/ThemedView.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/__tests__/ThemedText-test.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/__tests__/__snapshots__/ThemedText-test.tsx.snap" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/gameComponents/InfoBar.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/ui/IconSymbol.ios.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/ui/IconSymbol.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/ui/TabBarBackground.ios.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/ui/TabBarBackground.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -120,7 +82,9 @@
       <workItem from="1739201762467" duration="151000" />
       <workItem from="1739201914532" duration="2031000" />
       <workItem from="1739204775881" duration="11000" />
-      <workItem from="1739206322999" duration="471000" />
+      <workItem from="1739206322999" duration="891000" />
+      <workItem from="1739217930010" duration="75000" />
+      <workItem from="1739218005969" duration="321000" />
     </task>
     <servers />
   </component>
