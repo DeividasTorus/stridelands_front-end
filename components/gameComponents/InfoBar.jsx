@@ -11,15 +11,35 @@ import {
   Animated,
   Easing,
   ImageBackground,
+    Alert,
+    FlatList,
+    Button
 } from "react-native";
 import { useRouter } from "expo-router";
 import SlidingModal from "./SlidingModal";
 
+const initialNotifications = [
+  { id: 1, title: "New Message", message: "You have a new message from John! Click to read more.", time: "10:30 AM", read: false },
+  { id: 2, title: "Order Update", message: "Your order #1234 has been shipped and will arrive soon.", time: "Yesterday", read: false },
+  { id: 3, title: "Meeting Reminder", message: "Reminder: Team meeting at 3 PM. Don't be late!", time: "Monday", read: false }
+];
+const initialMails = [
+  { id: 1, title: "Mark", message: "You have a new message from John! Click to read more.", time: "10:30 AM", read: false },
+  { id: 2, title: "David", message: "Your order #1234 has been shipped and will arrive soon.", time: "Yesterday", read: false },
+  { id: 3, title: "SideRide", message: "Reminder: Team meeting at 3 PM. Don't be late!", time: "Monday", read: false }
+];
+
 export default function InfoBar() {
   const [user, setUser] = useState(null);
   const [resources, setResources] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
+  const [notificationsModalVisible, setNotificationsModalVisible] = useState(false);
+  const [mailsModalVisible, setMailsModalVisible] = useState(false);
   const router = useRouter();
+  const [notifications, setNotifications] = useState(initialNotifications);
+  const [selectedNotification, setSelectedNotification] = useState(null);
+  const [mails, setMails] = useState(initialMails);
+  const [selectedMails, setSelectedMails] = useState(null);
 
   useEffect(() => {
     const fetchedUser = {
@@ -51,6 +71,25 @@ export default function InfoBar() {
   const buildMaterialsMax = 5000;
   const cropMax = 3000;
 
+  const handleNotificationPress = (notification) => {
+    setNotifications((prevNotifications) =>
+        prevNotifications.map((notif) =>
+            notif.id === notification.id ? { ...notif, read: true } : notif
+        )
+    );
+    setSelectedNotification(notification);
+  };
+
+  const handleMailPress = (mail) => {
+    setMails((prevMails) =>
+        prevMails.map((notif) =>
+            notif.id === mail.id ? { ...notif, read: true } : notif
+        )
+    );
+    setSelectedMails(mail);
+  };
+
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -70,15 +109,21 @@ export default function InfoBar() {
             </View>
           </View>
           <View style={styles.actionsSection}>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity
+                style={styles.actionButton}
+                  onPress={() => setMailsModalVisible((prev) => !prev)}
+            >
               <Image style={styles.icons} source={require("../../assets/images/mailIcon.png")}/>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => setNotificationsModalVisible((prev) => !prev)}
+            >
               <Image style={styles.icons} source={require("../../assets/images/bellIcon.png")}/>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.actionButton}
-              onPress={() => setModalVisible((prev) => !prev)}
+              onPress={() => setSettingsModalVisible((prev) => !prev)}
             >
               <Image style={styles.icons} source={require("../../assets/images/setting.png")}/>
             </TouchableOpacity>
@@ -110,27 +155,84 @@ export default function InfoBar() {
           </View>
         </View>
       </View>
+      <SlidingModal isVisible={mailsModalVisible} setIsVisible={setMailsModalVisible}>
+        <Text style={styles.modalTitle}>Mails</Text>
 
-      <SlidingModal isVisible={modalVisible} setIsVisible={setModalVisible}>
+        {selectedMails ? (
+            // Show Full Notification Details
+            <View style={styles.notificationDetails}>
+              <Text style={styles.detailTitle}>{selectedMails.title}</Text>
+              <Text style={styles.detailMessage}>{selectedMails.message}</Text>
+              <Text style={styles.detailTime}>{selectedMails.time}</Text>
+              <Button title="Back to Notifications" onPress={() => setSelectedMails(null)} />
+            </View>
+        ) : (
+            // Show Notification List with Read/Unread Indicator
+            <FlatList
+                style={styles.notificationsList}
+                data={mails}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                    <TouchableOpacity onPress={() => handleMailPress(item)} style={[styles.notificationItem, !item.read && styles.unreadNotifications]}>
+                      <Text style={[styles.notificationTitle, !item.read && styles.unreadText]}>{item.title}</Text>
+                      <Text style={styles.notificationText}>
+                        {item.message.length > 30 ? item.message.substring(0, 30) + "..." : item.message}
+                      </Text>
+                      <Text style={styles.notificationTime}>{item.time}</Text>
+                    </TouchableOpacity>
+                )}
+            />
+        )}
+      </SlidingModal>
+      <SlidingModal isVisible={notificationsModalVisible} setIsVisible={setNotificationsModalVisible}>
+        <Text style={styles.modalTitle}>Notifications</Text>
+
+        {selectedNotification ? (
+            // Show Full Notification Details
+            <View style={styles.notificationDetails}>
+              <Text style={styles.detailTitle}>{selectedNotification.title}</Text>
+              <Text style={styles.detailMessage}>{selectedNotification.message}</Text>
+              <Text style={styles.detailTime}>{selectedNotification.time}</Text>
+              <Button title="Back to Notifications" onPress={() => setSelectedNotification(null)} />
+            </View>
+        ) : (
+            // Show Notification List with Read/Unread Indicator
+            <FlatList
+                style={styles.notificationsList}
+                data={notifications}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                    <TouchableOpacity onPress={() => handleNotificationPress(item)} style={[styles.notificationItem, !item.read && styles.unreadNotifications]}>
+                      <Text style={[styles.notificationTitle, !item.read && styles.unreadText]}>{item.title}</Text>
+                      <Text style={styles.notificationText}>
+                        {item.message.length > 30 ? item.message.substring(0, 30) + "..." : item.message}
+                      </Text>
+                      <Text style={styles.notificationTime}>{item.time}</Text>
+                    </TouchableOpacity>
+                )}
+            />
+        )}
+      </SlidingModal>
+      <SlidingModal isVisible={settingsModalVisible} setIsVisible={setSettingsModalVisible}>
         <Text style={styles.modalTitle}>
           Settings
         </Text>
         <View style={styles.settingsButtons}>
           <TouchableOpacity
             style={styles.modalButton}
-            onPress={() => setModalVisible(false)}
+            onPress={() => setSettingsModalVisible(false)}
           >
             <Text style={styles.modalButtonText}>Contact Us</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalButton}
-            onPress={() => setModalVisible(false)}
+            onPress={() => setSettingsModalVisible(false)}
           >
             <Text style={styles.modalButtonText}>Privacy</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.modalButton}
-            onPress={() => setModalVisible(false)}
+            onPress={() => setSettingsModalVisible(false)}
           >
             <Text style={styles.modalButtonText}>Agreement</Text>
           </TouchableOpacity>
@@ -139,7 +241,7 @@ export default function InfoBar() {
           <TouchableOpacity
             style={styles.modalButton}
             onPress={() => {
-              setModalVisible(false);
+              setSettingsModalVisible(false);
               router.push('auth/login');
             }}
           >
@@ -275,6 +377,62 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     marginTop: 30
+  },
+  notificationsList:{
+    marginTop: 8,
+    paddingBottom: 20
+  },
+  notificationItem: {
+    marginTop: 5,
+    padding: 7,
+    width: '89%',
+    marginLeft: 14,
+    borderWidth: 2,
+    borderColor: '#8B4513',
+    borderTopWidth: 2,
+    borderRadius: 8,
+    backgroundColor: 'rgba(182, 135, 81, 0.20)',
+  },
+  notificationTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 2,
+    color: 'rgb(107, 57, 0)',
+  },
+  notificationText: {
+    fontSize: 14,
+    color: '#555',
+  },
+  notificationTime: {
+    fontSize: 12,
+    color: 'rgb(107, 57, 0)',
+    marginTop: 5,
+  },
+  notificationDetails: {
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  detailTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  detailMessage: {
+    fontSize: 16,
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  detailTime: {
+    fontSize: 14,
+    color: '#999',
+    marginBottom: 20,
+  },
+  unreadNotifications:{
+    backgroundColor: 'rgba(182, 135, 81, 0.52)',
+  },
+  unreadText: {
+    fontWeight: 'bold',
   },
 });
 

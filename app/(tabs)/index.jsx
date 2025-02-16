@@ -6,12 +6,12 @@ const { width, height } = Dimensions.get("window");
 
 export default function VillageScreen() {
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const [buildingsModalVisible, setBuildingsModalVisible] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState("");
 
   const handleBuildingPress = (buildingName) => {
     setSelectedBuilding(buildingName);
-    setModalVisible(true);
+    setBuildingsModalVisible(true);
   };
 
   const buildings = [
@@ -73,7 +73,7 @@ export default function VillageScreen() {
               style={[styles.building, { top: building.top, left: building.left }]}
               onPress={() => {
                 handleBuildingPress(building.name);
-                setModalVisible(true);
+                setBuildingsModalVisible(true);
               }}
             >
               <Text style={styles.buildingText}>{index + 1}</Text>
@@ -81,7 +81,7 @@ export default function VillageScreen() {
           ))}
         </ImageBackground>
       </View>
-      <SlidingModal isVisible={modalVisible} setIsVisible={setModalVisible}>
+      <SlidingModal isVisible={buildingsModalVisible} setIsVisible={setBuildingsModalVisible}>
         <Text style={styles.modalTitle}>
           {selectedBuilding}
         </Text>
