@@ -32,6 +32,10 @@ export default function RootLayout() {
           require("../assets/images/cloud1.png"),
           require("../assets/images/cloud2.png"),
           require("../assets/images/modalFrame.png"),
+          require("../assets/images/soldier.png"),
+          require("../assets/images/xpIcon.png"),
+          require("../assets/images/healthIcon.png"),
+          require("../assets/images/swordIcon.png"),
         ];
 
         // ✅ Use Asset.loadAsync instead of .downloadAsync()

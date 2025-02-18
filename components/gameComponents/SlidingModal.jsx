@@ -44,7 +44,7 @@ const SlidingModal = ({ isVisible, setIsVisible, children }) => {
           <ImageBackground
             source={require('../../assets/images/modalFrame.png')}
             style={styles.backgroundImage}
-            resizeMode="cover"
+            resizeMode="contain"
           >
             <View style={styles.modalContent}>
               <TouchableOpacity
@@ -65,8 +65,6 @@ const SlidingModal = ({ isVisible, setIsVisible, children }) => {
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
   },
   modalContainer: {
     width: '100%',
@@ -80,20 +78,19 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   modalContent: {
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
   },
   exitButton: {
     position: 'absolute',
-    top: 150,
-    right: 80,
+    top: 105,
+    right: 50,
     paddingHorizontal: 6,
     paddingVertical: 4,
     borderRadius: 10,
     backgroundColor: 'rgba(100, 54, 1, 0.55)',
     borderWidth: 2,
     borderColor: "rgba(100, 54, 1, 0.55)",
+    zIndex: 99999
   },
   exitButtonText: {
     color: 'rgb(201, 171, 136)',
