@@ -36,6 +36,7 @@ export default function RootLayout() {
           require("../assets/images/xpIcon.png"),
           require("../assets/images/healthIcon.png"),
           require("../assets/images/swordIcon.png"),
+          require("../assets/images/lvlIcon.png"),
         ];
 
         // ✅ Use Asset.loadAsync instead of .downloadAsync()
