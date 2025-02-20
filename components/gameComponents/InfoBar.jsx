@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -18,32 +18,17 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import SlidingModal from "./SlidingModal";
+import { UserContext } from "../../context/UserContext";
+import { GameContext } from "../../context/GameContext";
 
-const initialNotifications = [
-  { id: 1, title: "New Message", message: "Sveiki atvykę! H1p5ter1s Tai nauji jūsų namai. Apsižvalgykite. Vešlūs laukai, auksiniai ūkio augalai ir geležies kalnai – jie visi priklauso tau. Galbūt jūsų kaimas kol kas nėra didelis, bet protu ir sunkiu darbu galite jį paversti imperija. Vis dėlto didžiam vadovui reikia daugiau nei dorybės – jam reikia išminties. Todėl paklausykite manęs: Pasaulis sukasi aplink resursus. Jie reikalingi jūsų pastatams, jūsų kariuomenė jais maitinasi ir dėl jų kariaujama karuose. Tačiau svarbu, kad suprastumėte: ištekliai yra priemonė, kuri gali pasibaigti. Visada juos išnaudokite. Jūsų pradedančiojo apsauga išnyks po 5 dienų, o užpuolikai ilgai nelauks. Dažnai žaiskite ir investuokite į slėptuvę bei kitus išteklių laukus, kad išlaikytumėte klestinčią ekonomiką.", time: "10:30 AM", read: false },
-  { id: 2, title: "Order Update", message: "Your order #1234 has been shipped and will arrive soon.", time: "Yesterday", read: false },
-  { id: 3, title: "Meeting Reminder", message: "Reminder: Team meeting at 3 PM. Don't be late!", time: "Monday", read: false },
-  { id: 4, title: "New Message", message: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum", time: "10:30 AM", read: false },
-  { id: 5, title: "Order Update", message: "Your order #1234 has been shipped and will arrive soon.", time: "Yesterday", read: false },
-  { id: 6, title: "Meeting Reminder", message: "Reminder: Team meeting at 3 PM. Don't be late!", time: "Monday", read: false }
-];
-const initialMails = [
-  { id: 1, title: "Nothing here", sender: "Mark", message: "Sveiki atvykę! H1p5ter1s Tai nauji jūsų namai. Apsižvalgykite. Vešlūs laukai, auksiniai ūkio augalai ir geležies kalnai – jie visi priklauso tau. Galbūt jūsų kaimas kol kas nėra didelis, bet protu ir sunkiu darbu galite jį paversti imperija. Vis dėlto didžiam vadovui reikia daugiau nei dorybės – jam reikia išminties. Todėl paklausykite manęs: Pasaulis sukasi aplink resursus. Jie reikalingi jūsų pastatams, jūsų kariuomenė jais maitinasi ir dėl jų kariaujama karuose. Tačiau svarbu, kad suprastumėte: ištekliai yra priemonė, kuri gali pasibaigti. Visada juos išnaudokite. Jūsų pradedančiojo apsauga išnyks po 5 dienų, o užpuolikai ilgai nelauks. Dažnai žaiskite ir investuokite į slėptuvę bei kitus išteklių laukus, kad išlaikytumėte klestinčią ekonomiką.", time: "10:30 AM", read: false },
-  { id: 2, title: "Party invite", sender: "David", message: "Your order #1234 has been shipped and will arrive soon.", time: "Yesterday", read: false },
-  { id: 3, title: "Games begins", sender: "StrideLands", message: "Reminder: Team meeting at 3 PM. Don't be late!", time: "Monday", read: false }
-];
 
 export default function InfoBar() {
-  const [user, setUser] = useState(null);
-  const [resources, setResources] = useState([]);
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
   const [notificationsModalVisible, setNotificationsModalVisible] = useState(false);
   const [mailsModalVisible, setMailsModalVisible] = useState(false);
   const [userInfoModalVisible, setUserInfoModalVisible] = useState(false);
   const router = useRouter();
-  const [notifications, setNotifications] = useState(initialNotifications);
   const [selectedNotification, setSelectedNotification] = useState(null);
-  const [mails, setMails] = useState(initialMails);
   const [selectedMails, setSelectedMails] = useState(null);
   const [currentView, setCurrentView] = useState('info'); // 'info' or 'levelUp'
   const [credits, setCredits] = useState(100); // Dummy credits for leveling up
@@ -53,42 +38,13 @@ export default function InfoBar() {
     defense: 0
   });
 
-  useEffect(() => {
-    const fetchedUser = {
-      name: "Player1",
-      icon: require("../../assets/images/barbarian.jpg"),
-      level: 22,
-      health: 75,
-      maxHealth: 100,
-      experience: 352,
-      maxExperience: 500,
-      strength: 180,
-      credits: 100, // Add initial credits for level-up
-    };
-    setUser(fetchedUser);
-
-    const fetchedResources = [
-      { name: "Gold", value: 200 },
-      { name: "Wood", value: 100000 },
-      { name: "Clay", value: 80000 },
-      { name: "Iron", value: 600000 },
-      { name: "Crop", value: 20000 },
-    ];
-    setResources(fetchedResources);
-  }, []);
-
-  if (!user || resources.length === 0) return null;
-
-  const wood = resources.find(r => r.name === "Wood")?.value || 0;
-  const clay = resources.find(r => r.name === "Clay")?.value || 0;
-  const iron = resources.find(r => r.name === "Iron")?.value || 0;
-  const crop = resources.find(r => r.name === "Crop")?.value || 0;
-
-  const buildMaterialsTotal = wood + clay + iron;
-  const buildMaterialsMax = 5000;
+  const { user, logout } = useContext(UserContext);
+  const { level, experience, maxExperience, resources, buildMaterialsTotal, buildMaterialsMax, mails, notifications } = useContext(GameContext);
+  const [mail, setMail] = useState(mails);
+  const [notification, setNotification] = useState(notifications);
 
   const handleNotificationPress = (notification) => {
-    setNotifications((prevNotifications) =>
+    setNotification((prevNotifications) =>
       prevNotifications.map((notif) =>
         notif.id === notification.id ? { ...notif, read: true } : notif
       )
@@ -97,7 +53,7 @@ export default function InfoBar() {
   };
 
   const handleMailPress = (mail) => {
-    setMails((prevMails) =>
+    setMail((prevMails) =>
       prevMails.map((notif) =>
         notif.id === mail.id ? { ...notif, read: true } : notif
       )
@@ -176,22 +132,22 @@ export default function InfoBar() {
             <TouchableOpacity
               onPress={() => setUserInfoModalVisible((prev) => !prev)}
             >
-              <Image style={styles.userIcon} source={user.icon} />
+              <Image style={styles.userIcon} source={{ uri: user.avatar }} />
             </TouchableOpacity>
             <View style={styles.userInfo}>
               {/* <Text style={styles.username}>{user.name}</Text> */}
               <View style={{ flexDirection: 'row', marginTop: 10, }}>
                 <View style={{ alignItems: 'center', }}>
-                  <Text style={{ position: 'absolute', top: 4, fontWeight: 'bold', fontSize: 18, color: 'rgba(107, 57, 0, 0.90)', }}>{user.level}</Text>
+                  <Text style={{ position: 'absolute', top: 4, fontWeight: 'bold', fontSize: 18, color: 'rgba(107, 57, 0, 0.90)', }}>{level}</Text>
                   <Image style={{ width: 45, height: 35, marginBottom: 2 }} source={require("../../assets/images/lvlIcon.png")} />
                 </View>
-                <Text style={{ fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', fontSize: 12, marginTop: 20 }}>{user.maxExperience}/{user.experience}</Text>
+                <Text style={{ fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', fontSize: 12, marginTop: 20 }}>{maxExperience}/{experience}</Text>
               </View>
               <View style={styles.progressBarContainer}>
                 <View
                   style={[
                     styles.progressBar,
-                    { width: `${(user.experience / user.maxExperience) * 100}%` },
+                    { width: `${(experience / maxExperience) * 100}%` },
                   ]}
                 />
               </View>
@@ -228,19 +184,19 @@ export default function InfoBar() {
           </View> */}
           <View style={styles.resourceItem}>
             <Image source={require("../../assets/images/woodIcon.png")} style={styles.resourceIcon} />
-            <Text style={styles.resourceText}>{wood}</Text>
+            <Text style={styles.resourceText}>{resources.wood}</Text>
           </View>
           <View style={styles.resourceItem}>
             <Image source={require("../../assets/images/bricksIcon.png")} style={styles.resourceIcon} />
-            <Text style={styles.resourceText}>{clay}</Text>
+            <Text style={styles.resourceText}>{resources.clay}</Text>
           </View>
           <View style={styles.resourceItem}>
             <Image source={require("../../assets/images/ironIcon.png")} style={styles.resourceIcon} />
-            <Text style={styles.resourceText}>{iron}</Text>
+            <Text style={styles.resourceText}>{resources.iron}</Text>
           </View>
           <View style={styles.resourceItem}>
             <Image source={require("../../assets/images/cropIcon.png")} style={styles.resourceIcon} />
-            <Text style={styles.resourceText}>{crop}</Text>
+            <Text style={styles.resourceText}>{resources.crop}</Text>
           </View>
         </View>
       </View>
@@ -253,7 +209,7 @@ export default function InfoBar() {
               <View style={{}}>
                 <View style={{ flexDirection: "row", }}>
                   <Text style={{ fontSize: 14, marginRight: 3 }}>Sender: </Text>
-                  <Text style={styles.detailTitle}>{selectedMails.sender}</Text>
+                  <Text style={styles.detailTitle}>{mails.sender}</Text>
                 </View>
                 <View style={{ flexDirection: "row", }}>
                   <Text style={{ fontSize: 14, marginRight: 3 }}>Subject: </Text>
@@ -281,7 +237,7 @@ export default function InfoBar() {
           <View style={styles.notificationsListContainer}>
             <FlatList
               style={styles.notificationsList}
-              data={mails}
+              data={mail}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
                 <TouchableOpacity onPress={() => handleMailPress(item)} style={[styles.notificationItem, !item.read && styles.unreadNotifications]}>
@@ -328,7 +284,7 @@ export default function InfoBar() {
           <View style={styles.notificationsListContainer}>
             <FlatList
               style={styles.notificationsList}
-              data={notifications}
+              data={notification}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
                 <TouchableOpacity onPress={() => handleNotificationPress(item)} style={[styles.notificationItem, !item.read && styles.unreadNotifications]}>
@@ -374,7 +330,7 @@ export default function InfoBar() {
                 style={styles.modalButton}
                 onPress={() => {
                   setSettingsModalVisible(false);
-                  router.push('auth/login');
+                  logout()
                 }}
               >
                 <Text style={styles.modalButtonText}>Logout</Text>
@@ -408,7 +364,7 @@ export default function InfoBar() {
                   <View style={{ flexDirection: "row", marginTop: 15 }}>
                     <Image style={styles.xpIcon} source={require("../../assets/images/xpIcon.png")} />
                     <Text style={{ fontSize: 14, marginRight: 32, fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', }}>Experiance: </Text>
-                    <Text style={{marginLeft: 20, marginTop: 15, fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', fontSize: 12, }}>{user.maxExperience}/{user.experience}</Text>
+                    <Text style={{ marginLeft: 20, marginTop: 15, fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', fontSize: 12, }}>{user.maxExperience}/{user.experience}</Text>
                     <View style={styles.userExperienceBarContainer}>
                       <View
                         style={[
@@ -418,10 +374,10 @@ export default function InfoBar() {
                       />
                     </View>
                   </View>
-                  <View style={{ flexDirection: "row", marginTop: 5,}}>
+                  <View style={{ flexDirection: "row", marginTop: 5, }}>
                     <Image style={styles.xpIcon} source={require("../../assets/images/healthIcon.png")} />
                     <Text style={{ fontSize: 14, marginRight: 85, fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', }}>Health:</Text>
-                    <Text style={{marginLeft: 0, fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', fontSize: 12, marginTop: 15 }}>{user.maxHealth}/{user.health}</Text>
+                    <Text style={{ marginLeft: 0, fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', fontSize: 12, marginTop: 15 }}>{user.maxHealth}/{user.health}</Text>
                     <View style={styles.userExperienceBarContainer}>
                       <View
                         style={[
@@ -431,7 +387,7 @@ export default function InfoBar() {
                       />
                     </View>
                   </View>
-                  <View style={{ flexDirection: "row", marginTop: 5,}}>
+                  <View style={{ flexDirection: "row", marginTop: 5, }}>
                     <Image style={styles.xpIcon} source={require("../../assets/images/swordIcon.png")} />
                     <Text style={{ fontSize: 14, marginRight: 3, fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', }}>Strength: </Text>
                     <Text style={styles.strengthText}>{user.strength}</Text>

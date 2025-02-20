@@ -1,17 +1,29 @@
-import { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { useState, useContext } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from "react-native";
 import { useRouter } from "expo-router";
+import { UserContext } from "../../context/UserContext";
+import { Image as RNImage } from "react-native"; // Required for resolving asset paths
+
+// ✅ Define avatar options with full paths
+const avatars = [
+  { label: "Barbarian", path: require("../../assets/images/barbarian.jpg") },
+  { label: "Crop", path: require("../../assets/images/cropIcon.png") },
+  { label: "Health", path: require("../../assets/images/healthIcon.png") },
+  { label: "Iron", path: require("../../assets/images/ironIcon.png") },
+];
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { login } = useContext(UserContext);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [selectedTribe, setSelectedTribe] = useState(null);
+  const [selectedAvatar, setSelectedAvatar] = useState(avatars[0].path); // Default avatar
   const [agreeTerms, setAgreeTerms] = useState(false);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!username || !email || !password || !confirmPassword || !selectedTribe) {
       Alert.alert("Error", "Please fill in all fields.");
       return;
@@ -25,14 +37,47 @@ export default function RegisterScreen() {
       return;
     }
 
+    // ✅ Convert the selected avatar to a **string URL**
+    const avatarUri = RNImage.resolveAssetSource(selectedAvatar).uri;
+
+    // ✅ Store full image URL in AsyncStorage
+    const newUser = {
+      id: Date.now(),
+      name: username,
+      email: email,
+      tribe: selectedTribe,
+      avatar: avatarUri, // ✅ Now stored as a **string**
+    };
+
+    const authToken = "valid-token-" + newUser.id;
+
+    // ✅ Store user data in context & AsyncStorage
+    await login(newUser, authToken);
+
     Alert.alert("Success", "Account created successfully!");
-    router.replace("/auth/login"); // Navigate to login after successful registration
+    router.replace("/(tabs)"); // ✅ Navigate to game screen
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.formContainer}>
         <Text style={styles.title}>Register</Text>
+
+        {/* Avatar Selection */}
+        <Text style={styles.label}>Choose Your Avatar</Text>
+        <View style={styles.avatarContainer}>
+          {avatars.map((avatar, index) => (
+            <TouchableOpacity key={index} onPress={() => setSelectedAvatar(avatar.path)}>
+              <Image
+                source={avatar.path} // ✅ Use local image source
+                style={[
+                  styles.avatar,
+                  selectedAvatar === avatar.path ? styles.selectedAvatar : null,
+                ]}
+              />
+            </TouchableOpacity>
+          ))}
+        </View>
 
         <TextInput
           placeholder="Username"
@@ -134,6 +179,23 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     color: "#8B4513",
   },
+  avatarContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 15,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginHorizontal: 5,
+    borderWidth: 2,
+    borderColor: "transparent",
+  },
+  selectedAvatar: {
+    borderColor: "#8B4513",
+    borderWidth: 3,
+  },
   input: {
     width: "90%",
     height: 40,
@@ -177,7 +239,7 @@ const styles = StyleSheet.create({
     color: "#8B4513",
   },
   selectedTribeText: {
-    color: "#FFF", // Brightens text when selected
+    color: "#FFF",
   },
   termsContainer: {
     flexDirection: "row",
@@ -198,21 +260,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#8B4513",
   },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
   button: {
-    flex: 1,
     backgroundColor: "#8B4513",
     padding: 10,
     margin: 5,
     alignItems: "center",
     borderRadius: 5,
-  },
-  loginButton: {
-    backgroundColor: "#A0522D",
+    width: "100%",
   },
   buttonText: {
     color: "#FFF",
@@ -225,7 +279,3 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
-
-
-
-

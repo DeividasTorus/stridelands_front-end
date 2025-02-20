@@ -1,25 +1,30 @@
-import { Stack, useSegments } from "expo-router";
-import { useState, useEffect } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { Stack, useSegments, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
-import { Asset } from "expo-asset";
+import { ActivityIndicator, View } from "react-native";
+import { Asset } from "expo-asset"; // ✅ Added asset loading back
 import InfoBar from "../components/gameComponents/InfoBar";
 import { Provider } from "react-native-paper";
+import { UserProvider, UserContext } from "../context/UserContext";
+import { GameProvider } from "../context/GameContext";
 
 // ✅ Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+const RootLayoutContent = () => {
   const [isAppReady, setAppReady] = useState(false);
+  const { user, isLoading, login } = useContext(UserContext);
+  const router = useRouter();
   const segments = useSegments();
 
   useEffect(() => {
     async function prepareApp() {
       try {
-        console.log("Starting to load images...");
+        console.log("⏳ Loading assets and user data...");
 
+        // ✅ Load assets before proceeding
         const images = [
           require("../assets/images/villageMap.png"),
           require("../assets/images/barbarian.jpg"),
@@ -29,26 +34,39 @@ export default function RootLayout() {
           require("../assets/images/ironIcon.png"),
           require("../assets/images/cropIcon.png"),
           require("../assets/images/StrideLands.png"),
-          require("../assets/images/cloud1.png"),
-          require("../assets/images/cloud2.png"),
           require("../assets/images/modalFrame.png"),
           require("../assets/images/soldier.png"),
           require("../assets/images/xpIcon.png"),
           require("../assets/images/healthIcon.png"),
           require("../assets/images/swordIcon.png"),
           require("../assets/images/lvlIcon.png"),
+          require("../assets/images/townHallIcon.png"),
+          require("../assets/images/barracksIcon.png"),
+          require("../assets/images/grainMillIcon.png"),
+          require("../assets/images/wareHouseIcon.png"),
+          require("../assets/images/brickyardIcon.png"),
+          require("../assets/images/sawmillIcon.png"),
+          require("../assets/images/ironFoundryIcon.png"),
         ];
 
-        // ✅ Use Asset.loadAsync instead of .downloadAsync()
-        await Asset.loadAsync(images);
+        await Asset.loadAsync(images); // ✅ Ensures assets are loaded
+        console.log("✅ Assets loaded successfully.");
 
-        console.log("All images loaded successfully.");
+        // ✅ Load authentication data
+        const storedToken = await AsyncStorage.getItem("userToken");
+        const storedUser = await AsyncStorage.getItem("user");
 
-        const token = await AsyncStorage.getItem("userToken");
-        setIsAuthenticated(!!token);
+        console.log("🔄 On app start, AsyncStorage values:", { storedUser, storedToken });
+
+        if (storedToken && storedUser) {
+          login(JSON.parse(storedUser), storedToken);
+        } else {
+          console.log("🚪 No valid user found, clearing invalid token...");
+          await AsyncStorage.removeItem("userToken");
+          await AsyncStorage.removeItem("user");
+        }
       } catch (error) {
-        console.error("Error loading assets or checking auth:", error);
-        setIsAuthenticated(false);
+        console.error("❌ Error loading assets or checking auth:", error);
       } finally {
         setAppReady(true);
         await SplashScreen.hideAsync();
@@ -58,18 +76,29 @@ export default function RootLayout() {
     prepareApp();
   }, []);
 
+  useEffect(() => {
+    if (isAppReady && !isLoading) {
+      if (!user) {
+        console.log("🔄 Redirecting to login screen...");
+        router.replace("/auth"); // ✅ Forces redirect to login
+      }
+    }
+  }, [isAppReady, isLoading, user]);
 
-  // ✅ Keep the splash screen visible until everything is loaded
-  if (!isAppReady) {
-    return null;
+  if (!isAppReady || isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
   }
 
-  const showInfoBar = !segments.includes("auth");
+  const isAuthenticated = !!user;
+  const showInfoBar = isAuthenticated && !segments.includes("auth");
 
   return (
-    <><Provider>
+    <Provider>
       <StatusBar hidden={true} />
-      {/*{isAuthenticated && showInfoBar && <InfoBar />}*/}
       {showInfoBar && <InfoBar />}
       <Stack screenOptions={{ headerShown: false }}>
         {!isAuthenticated ? (
@@ -79,9 +108,25 @@ export default function RootLayout() {
         )}
       </Stack>
     </Provider>
-    </>
   );
-}
+};
+
+// ✅ Wrap everything inside UserProvider
+const RootLayout = () => (
+  <UserProvider>
+    <GameProvider>
+      <RootLayoutContent />
+    </GameProvider>
+  </UserProvider>
+);
+
+export default RootLayout;
+
+
+
+
+
+
 
 
 

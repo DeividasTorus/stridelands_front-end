@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { UserContext } from "../../context/UserContext";
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { login } = useContext(UserContext); // ✅ Get login function from context
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -13,9 +14,24 @@ export default function LoginScreen() {
       Alert.alert("Error", "Please fill in both fields.");
       return;
     }
-    // Simulate login & save token
-    await AsyncStorage.setItem("userToken", "12345");
-    router.replace("/"); // Navigate to the home screen
+
+    // ✅ Simulate a valid user (Replace this with real API call)
+    if (username === "testuser" && password === "password") {
+      const userData = {
+        id: 1,
+        name: "Test User",
+        username: username,
+      };
+      const authToken = "valid-token-12345";
+
+      // ✅ Store user info in context & AsyncStorage
+      await login(userData, authToken);
+
+      Alert.alert("Success", "Logged in successfully!");
+      router.replace("/(tabs)"); // ✅ Navigate to game screen
+    } else {
+      Alert.alert("Error", "Invalid username or password.");
+    }
   };
 
   return (
@@ -64,9 +80,9 @@ const styles = StyleSheet.create({
   formContainer: {
     width: "80%",
     padding: 20,
-    backgroundColor: "#F8E8C1", // Scroll-like color
+    backgroundColor: "#F8E8C1",
     borderWidth: 5,
-    borderColor: "#8B4513", // Scroll border
+    borderColor: "#8B4513",
     borderRadius: 10,
     alignItems: "center",
     shadowColor: "#000",
@@ -105,9 +121,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 5,
   },
-  signUpButton: {
-    backgroundColor: "#A0522D",
-  },
   buttonText: {
     color: "#FFF",
     fontSize: 16,
@@ -119,4 +132,5 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
+
 
