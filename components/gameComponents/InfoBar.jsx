@@ -30,18 +30,33 @@ export default function InfoBar() {
   const router = useRouter();
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [selectedMails, setSelectedMails] = useState(null);
-  const [currentView, setCurrentView] = useState('info'); // 'info' or 'levelUp'
-  const [credits, setCredits] = useState(100); // Dummy credits for leveling up
+  const [currentView, setCurrentView] = useState('info');
   const [allocated, setAllocated] = useState({
     strength: 0,
     resources: 0,
     defense: 0
   });
 
-  const { user, logout } = useContext(UserContext);
-  const { level, experience, maxExperience, resources, buildMaterialsTotal, buildMaterialsMax, mails, notifications } = useContext(GameContext);
+  const { user, logout, } = useContext(UserContext);
+  const { level,
+    experience,
+    maxExperience,
+    resources,
+    buildMaterialsTotal,
+    buildMaterialsMax,
+    mails,
+    notifications,
+    health,
+    maxHealth,
+    strength,
+    levelUpStats,
+    credits,
+    setCredits
+  } = useContext(GameContext);
+
   const [mail, setMail] = useState(mails);
   const [notification, setNotification] = useState(notifications);
+  const [tempCredits, setTempCredits] = useState(credits); // Temporary credits for allocation
 
   const handleNotificationPress = (notification) => {
     setNotification((prevNotifications) =>
@@ -72,15 +87,17 @@ export default function InfoBar() {
       resources: 0,
       defense: 0
     });
+    resetAllocation()
   };
 
   const increaseAllocation = (field) => {
-    if (credits > 0) {
+    if (tempCredits > 0) {
       setAllocated((prev) => ({
         ...prev,
-        [field]: prev[field] + 1
+        [field]: prev[field] + 1,
       }));
-      setCredits(credits - 1);
+
+      setTempCredits((prev) => prev - 1); // ✅ Updates only tempCredits, NOT the global credits
     }
   };
 
@@ -88,38 +105,31 @@ export default function InfoBar() {
     if (allocated[field] > 0) {
       setAllocated((prev) => ({
         ...prev,
-        [field]: prev[field] - 1
+        [field]: prev[field] - 1,
       }));
-      setCredits(credits + 1);
+
+      setTempCredits((prev) => prev + 1); // ✅ Returns points back to tempCredits
     }
   };
 
   const confirmLevelUp = () => {
-    setUser(prevUser => ({
-      ...prevUser,
-      strength: prevUser.strength + allocated.strength,
-      health: prevUser.health + (allocated.defense * 10)
-    }));
-    setResources(prevResources =>
-      prevResources.map(r => ({
-        ...r,
-        value: r.value + (allocated.resources * 1000)
-      }))
-    );
-    setAllocated({
-      strength: 0,
-      resources: 0,
-      defense: 0
-    });
-    setCurrentView('info');
+    if (allocated.strength > 0 || allocated.defense > 0 || allocated.resources > 0) {
+      levelUpStats(allocated);
+      setCredits(tempCredits); // ✅ Now credits update correctly
+      setAllocated({
+        strength: 0,
+        defense: 0,
+        resources: 0,
+      });
+    }
   };
 
   const resetAllocation = () => {
-    setCredits(credits + allocated.strength + allocated.resources + allocated.defense);
+    setTempCredits(credits); // ✅ Restore the initial credits amount
     setAllocated({
       strength: 0,
+      defense: 0,
       resources: 0,
-      defense: 0
     });
   };
 
@@ -175,7 +185,9 @@ export default function InfoBar() {
           </View>
         </View>
         <View style={styles.barnSection}>
-          <Text style={styles.barnText}>🏚️ {buildMaterialsMax}/{buildMaterialsTotal}</Text>
+          <Text style={styles.barnText}>
+            🏚️{buildMaterialsMax} / {buildMaterialsTotal}
+          </Text>
         </View>
         <View style={styles.resourcesSection}>
           {/* <View style={styles.resourceItem}>
@@ -345,7 +357,7 @@ export default function InfoBar() {
         {currentView === 'info' && (
           <>
             <Text style={styles.modalTitle}>
-              Player1
+              {user.name}
             </Text>
             <View style={styles.userInfoDetailsContainer}>
               <View style={styles.userInfoDetails}>
@@ -356,7 +368,7 @@ export default function InfoBar() {
                 </View>
                 <View style={{ position: 'absolute', top: 20, left: 35 }}>
                   <View style={{ alignItems: 'center', }}>
-                    <Text style={{ position: 'absolute', top: 12, fontWeight: 'bold', fontSize: 35, color: 'rgba(107, 57, 0, 0.90)', }}>{user.level}</Text>
+                    <Text style={{ position: 'absolute', top: 12, fontWeight: 'bold', fontSize: 35, color: 'rgba(107, 57, 0, 0.90)', }}>{level}</Text>
                     <Image style={{ width: 100, height: 80 }} source={require("../../assets/images/lvlIcon.png")} />
                   </View>
                 </View>
@@ -364,12 +376,12 @@ export default function InfoBar() {
                   <View style={{ flexDirection: "row", marginTop: 15 }}>
                     <Image style={styles.xpIcon} source={require("../../assets/images/xpIcon.png")} />
                     <Text style={{ fontSize: 14, marginRight: 32, fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', }}>Experiance: </Text>
-                    <Text style={{ marginLeft: 20, marginTop: 15, fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', fontSize: 12, }}>{user.maxExperience}/{user.experience}</Text>
+                    <Text style={{ marginLeft: 20, marginTop: 15, fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', fontSize: 12, }}>{maxExperience}/{experience}</Text>
                     <View style={styles.userExperienceBarContainer}>
                       <View
                         style={[
                           styles.userExperienceBar,
-                          { width: `${(user.experience / user.maxExperience) * 100}%` },
+                          { width: `${(experience / maxExperience) * 100}%` },
                         ]}
                       />
                     </View>
@@ -377,12 +389,12 @@ export default function InfoBar() {
                   <View style={{ flexDirection: "row", marginTop: 5, }}>
                     <Image style={styles.xpIcon} source={require("../../assets/images/healthIcon.png")} />
                     <Text style={{ fontSize: 14, marginRight: 85, fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', }}>Health:</Text>
-                    <Text style={{ marginLeft: 0, fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', fontSize: 12, marginTop: 15 }}>{user.maxHealth}/{user.health}</Text>
+                    <Text style={{ marginLeft: 0, fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', fontSize: 12, marginTop: 15 }}>{maxHealth}/{health}</Text>
                     <View style={styles.userExperienceBarContainer}>
                       <View
                         style={[
                           styles.userExperienceBar,
-                          { width: `${(user.health / user.maxHealth) * 100}%` },
+                          { width: `${(health / maxHealth) * 100}%` },
                         ]}
                       />
                     </View>
@@ -390,7 +402,7 @@ export default function InfoBar() {
                   <View style={{ flexDirection: "row", marginTop: 5, }}>
                     <Image style={styles.xpIcon} source={require("../../assets/images/swordIcon.png")} />
                     <Text style={{ fontSize: 14, marginRight: 3, fontWeight: 'bold', color: 'rgba(107, 57, 0, 0.90)', }}>Strength: </Text>
-                    <Text style={styles.strengthText}>{user.strength}</Text>
+                    <Text style={styles.strengthText}>{strength}</Text>
                   </View>
                 </View>
                 <TouchableOpacity style={styles.attributesButton} onPress={handleLevelUp}>
@@ -701,7 +713,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 10,
     lineHeight: 25,
-
   },
   detailTime: {
     fontSize: 14,
