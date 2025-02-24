@@ -5,11 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="794f0234-1534-4e4d-b9fd-79d46cf5ef2e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/components/buildingsModals/WarehouseModal.jsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/components/gameComponents/BuildingTimer.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/_layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/_layout.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/buildingsModals/TownHallModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/buildingsModals/TownHallModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/buildingsModals/WarehouseModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/buildingsModals/WarehouseModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/gameComponents/BuildingTimer.jsx" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/components/gameComponents/InfoBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/gameComponents/InfoBar.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/context/GameContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/context/GameContext.jsx" afterDir="false" />
     </list>
@@ -29,22 +30,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/Users/deividasit/TorusByte/StrideLands/stridelands_front-end",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
-    "ts.external.directory.path": "/Users/deividasit/TorusByte/StrideLands/stridelands_front-end/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/deividasit/TorusByte/StrideLands/stridelands_front-end&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/deividasit/TorusByte/StrideLands/stridelands_front-end/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -110,6 +111,8 @@
       <workItem from="1740211865508" duration="10951000" />
       <workItem from="1740226190923" duration="13553000" />
       <workItem from="1740305329268" duration="11367000" />
+      <workItem from="1740337083147" duration="295000" />
+      <workItem from="1740420682444" duration="594000" />
     </task>
     <servers />
   </component>

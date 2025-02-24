@@ -9,6 +9,7 @@ import InfoBar from "../components/gameComponents/InfoBar";
 import { Provider } from "react-native-paper";
 import { UserProvider, UserContext } from "../context/UserContext";
 import { GameProvider } from "../context/GameContext";
+import { VillageProvider } from "../context/VillageContext";
 
 // ✅ Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -47,6 +48,13 @@ const RootLayoutContent = () => {
           require("../assets/images/brickyardIcon.png"),
           require("../assets/images/sawmillIcon.png"),
           require("../assets/images/ironFoundryIcon.png"),
+          require("../assets/images/townHallIconBlack.png"),
+          require("../assets/images/barracksIconBlack.png"),
+          require("../assets/images/grainMillIconBlack.png"),
+          require("../assets/images/wareHouseIconBlack.png"),
+          require("../assets/images/brickyardIconBlack.png"),
+          require("../assets/images/sawmillIconBlack.png"),
+          require("../assets/images/ironFoundryIconBlack.png"),
         ];
 
         await Asset.loadAsync(images); // ✅ Ensures assets are loaded
@@ -115,7 +123,9 @@ const RootLayoutContent = () => {
 const RootLayout = () => (
   <UserProvider>
     <GameProvider>
-      <RootLayoutContent />
+      <VillageProvider>
+        <RootLayoutContent />
+      </VillageProvider>
     </GameProvider>
   </UserProvider>
 );
