@@ -18,22 +18,41 @@ export default function WarehouseModal({ isVisible, setIsVisible }) {
   if (!warehouse) return null;
 
   // Calculate upgrade cost (20% increase per level)
-  const upgradeCost = {
-    wood: Math.floor(warehouse.resourceCost.wood * 1.2),
-    clay: Math.floor(warehouse.resourceCost.clay * 1.2),
-    iron: Math.floor(warehouse.resourceCost.iron * 1.2),
-  };
-
-  // Check if there are enough resources to upgrade
-  const canUpgrade =
-    resources.wood >= upgradeCost.wood &&
-    resources.clay >= upgradeCost.clay &&
-    resources.iron >= upgradeCost.iron;
+  const upgradeCost = warehouse?.resourceCost
+    ? {
+      wood: Math.floor(warehouse.resourceCost.wood * 1.2),
+      clay: Math.floor(warehouse.resourceCost.clay * 1.2),
+      iron: Math.floor(warehouse.resourceCost.iron * 1.2),
+    }
+    : { wood: 0, clay: 0, iron: 0 }; // Default values to prevent errors
 
   const isUpgrading =
     warehouse.underConstruction &&
     warehouse.finishTime &&
     warehouse.finishTime > Date.now();
+
+  // Find Town Hall
+  const townHall = buildings.find((b) => b.name === "Town Hall");
+  const townHallLevel = townHall ? townHall.level : 0;
+
+  // Get the next upgrade level
+  const nextLevel = warehouse.built ? warehouse.level + 1 : 1;
+
+  // Required Town Hall level for the next Warehouse level
+  const requiredTownHallLevel = warehouse.upgradeRequirement?.[nextLevel - 1] || 0;
+
+  // Check if resources are sufficient
+  const hasEnoughResources =
+    resources.wood >= upgradeCost.wood &&
+    resources.clay >= upgradeCost.clay &&
+    resources.iron >= upgradeCost.iron;
+
+  // Check if the Town Hall meets the requirement
+  const meetsTownHallRequirement = townHallLevel >= requiredTownHallLevel;
+
+  // Final upgrade check: Must have enough resources & correct Town Hall level
+  const canUpgrade = hasEnoughResources && meetsTownHallRequirement;
+
 
   return (
     <SlidingModal isVisible={isVisible} setIsVisible={setIsVisible}>
@@ -149,12 +168,16 @@ export default function WarehouseModal({ isVisible, setIsVisible }) {
                     >
                       <View style={styles.upgradebuttonContainer}>
                         {isUpgrading ? (
-                          <View style={{alignItems: 'center'}}>
+                          <View style={{ alignItems: 'center' }}>
                             <Countdown finishTime={warehouse.finishTime} />
                           </View>
                         ) : (
                           <Text style={styles.upgradeButtonText}>
-                            {canUpgrade ? "Upgrade" : "Not Enough Resources"}
+                            {!meetsTownHallRequirement
+                              ? `Requires Town Hall Level ${requiredTownHallLevel}`
+                              : !hasEnoughResources
+                                ? "Not Enough Resources"
+                                : "Upgrade"}
                           </Text>
                         )}
                       </View>

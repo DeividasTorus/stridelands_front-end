@@ -2,6 +2,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { UserContext } from "./UserContext";
+import { Pedometer } from "expo-sensors";
 
 export const GameContext = createContext();
 
@@ -19,9 +20,14 @@ export const GameProvider = ({ children }) => {
     const [defense, setDefense] = useState(100);
     const [credits, setCredits] = useState(0);
 
+
+    // ✅ Step Tracking State
+    const [isTracking, setIsTracking] = useState(false);
+    const [stepsAtStart, setStepsAtStart] = useState(0);
+    const [currentSteps, setCurrentSteps] = useState(0);
+
     // ✅ User Resources
     const [resources, setResources] = useState({
-        gold: 1000,
         wood: 5000,
         clay: 3000,
         iron: 3600,
@@ -29,14 +35,7 @@ export const GameProvider = ({ children }) => {
     });
 
     // ✅ Notifications
-    const [notifications, setNotifications] = useState([
-        { id: 1, title: "New Message", message: "Sveiki atvykę! H1p5ter1s Tai nauji jūsų namai. Apsižvalgykite. Vešlūs laukai, auksiniai ūkio augalai ir geležies kalnai – jie visi priklauso tau. Galbūt jūsų kaimas kol kas nėra didelis, bet protu ir sunkiu darbu galite jį paversti imperija. Vis dėlto didžiam vadovui reikia daugiau nei dorybės – jam reikia išminties. Todėl paklausykite manęs: Pasaulis sukasi aplink resursus. Jie reikalingi jūsų pastatams, jūsų kariuomenė jais maitinasi ir dėl jų kariaujama karuose. Tačiau svarbu, kad suprastumėte: ištekliai yra priemonė, kuri gali pasibaigti. Visada juos išnaudokite. Jūsų pradedančiojo apsauga išnyks po 5 dienų, o užpuolikai ilgai nelauks. Dažnai žaiskite ir investuokite į slėptuvę bei kitus išteklių laukus, kad išlaikytumėte klestinčią ekonomiką.", time: "10:30 AM", read: false },
-        { id: 2, title: "Order Update", message: "Your order #1234 has been shipped and will arrive soon.", time: "Yesterday", read: false },
-        { id: 3, title: "Meeting Reminder", message: "Reminder: Team meeting at 3 PM. Don't be late!", time: "Monday", read: false },
-        { id: 4, title: "New Message", message: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum", time: "10:30 AM", read: false },
-        { id: 5, title: "Order Update", message: "Your order #1234 has been shipped and will arrive soon.", time: "Yesterday", read: false },
-        { id: 6, title: "Meeting Reminder", message: "Reminder: Team meeting at 3 PM. Don't be late!", time: "Monday", read: false }
-    ]);
+    const [notifications, setNotifications] = useState([]);
 
     // ✅ Mails
     const [mails, setMails] = useState([
@@ -60,6 +59,10 @@ export const GameProvider = ({ children }) => {
                 setStrength(150);
                 setDefense(100);
                 setCredits(0);
+                setIsTracking(false)
+                setStepsAtStart(0)
+                setCurrentSteps(0)
+                setNotifications([])
                 setResources({
                     gold: 1000,
                     wood: 5000,
@@ -100,6 +103,16 @@ export const GameProvider = ({ children }) => {
 
         fetchGameData();
     }, [user]);
+
+    // ✅ Notifications read status check
+
+    useEffect(() => {
+        if (user) {
+            AsyncStorage.setItem(`notifications_${user.id}`, JSON.stringify(notifications))
+                .catch(error => console.error("Error saving notifications:", error));
+        }
+    }, [notifications]);
+
 
     // ✅ Passive Health Regeneration
     useEffect(() => {
@@ -163,6 +176,28 @@ export const GameProvider = ({ children }) => {
         }
     };
 
+    const addNotification = (title, message) => {
+        const newNotification = {
+            id: `${Date.now()}-${Math.floor(Math.random() * 10000)}`, // ✅ Unique ID
+            title,
+            message,
+            time: new Date().toLocaleTimeString(),
+            read: false,
+        };
+
+        setNotifications((prevNotifications) => {
+            const updatedNotifications = [newNotification, ...prevNotifications];
+
+            // ✅ Store notifications in AsyncStorage instantly
+            if (user) {
+                AsyncStorage.setItem(`notifications_${user.id}`, JSON.stringify(updatedNotifications));
+            }
+
+            return updatedNotifications;
+        });
+    };
+
+
     const updateResources = async (newResources) => {
         setResources(newResources);
         if (user) await AsyncStorage.setItem(`resources_${user.id}`, JSON.stringify(newResources));
@@ -207,6 +242,90 @@ export const GameProvider = ({ children }) => {
         }
     };
 
+
+    // useEffect(() => {
+    //     fetchGameData();
+    // }, [user]);
+
+    // // ✅ Load game data
+    // const fetchGameData = async () => {
+    //     if (!user) return;
+    //     try {
+    //         setIsLoading(true);
+    //         const storedResources = await AsyncStorage.getItem(`resources_${user.id}`);
+    //         if (storedResources) setResources(JSON.parse(storedResources));
+    //     } catch (error) {
+    //         console.error("Error loading game data:", error);
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
+
+    const startTracking = async (durationHours) => {
+        const available = await Pedometer.isAvailableAsync();
+        if (!available) {
+            alert("Step tracking is not available on this device.");
+            return;
+        }
+
+        try {
+            const end = new Date();
+            const start = new Date();
+            start.setHours(start.getHours() - 1);
+            const result = await Pedometer.getStepCountAsync(start, end);
+            const initialSteps = result.steps || 0;
+
+            setStepsAtStart(initialSteps);
+            setCurrentSteps(initialSteps);
+            setIsTracking(true);
+
+            // Start tracking
+            const subscription = Pedometer.watchStepCount((result) => {
+                setCurrentSteps(result.steps);
+            });
+
+            // Stop tracking automatically after time limit
+            setTimeout(() => stopTracking(subscription), durationHours * 60 * 1000);
+        } catch (error) {
+            console.error("Error starting step tracking:", error);
+        }
+    };
+
+    // ✅ Stop Step Tracking and Convert Steps to Resources
+    const stopTracking = async (subscription) => {
+        if (subscription) subscription.remove();
+
+        const totalSteps = currentSteps - stepsAtStart;
+        if (totalSteps > 0) {
+            const earnedResources = {
+                wood: Math.floor(totalSteps / 1),
+                clay: Math.floor(totalSteps / 1),
+                iron: Math.floor(totalSteps / 1),
+                crop: Math.floor(totalSteps / 1),
+            };
+
+            const newResources = {
+                ...resources,
+                wood: resources.wood + earnedResources.wood,
+                clay: resources.clay + earnedResources.clay,
+                iron: resources.iron + earnedResources.iron,
+                crop: resources.crop + earnedResources.crop,
+            };
+
+            setResources(newResources);
+            await AsyncStorage.setItem(`resources_${user.id}`, JSON.stringify(newResources));
+        }
+
+        setIsTracking(false);
+        setStepsAtStart(0);
+        setCurrentSteps(0);
+    };
+
+
+
+
+
+
     return (
         <GameContext.Provider
             value={{
@@ -228,6 +347,12 @@ export const GameProvider = ({ children }) => {
                 updateLevel,
                 levelUpStats,
                 gainExperience,
+                addNotification,
+                setNotifications,
+                isTracking,
+                currentSteps,
+                startTracking,
+                stopTracking,
             }}
         >
             {children}

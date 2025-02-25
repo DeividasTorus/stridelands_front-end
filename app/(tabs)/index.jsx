@@ -8,6 +8,7 @@ import {
   Text,
   Image,
   ScrollView,
+  Button
 } from "react-native";
 import TownHallModal from "../../components/buildingsModals/TownHallModal";
 import SlidingModal from "../../components/gameComponents/SlidingModal";
@@ -40,9 +41,9 @@ const buildingIconsBlack = {
 
 export default function VillageScreen() {
   // Get building state and update function from VillageContext.
-  const { buildings, updateBuildings } = useContext(VillageContext);
+  const { buildings, updateBuildings, } = useContext(VillageContext);
   // Get resources and XP function from GameContext.
-  const { resources, gainExperience } = useContext(GameContext);
+  const { resources, gainExperience, isTracking, startTracking, currentSteps } = useContext(GameContext);
 
   const [selectedBuilding, setSelectedBuilding] = useState(null);
   const [buildMenuVisible, setBuildMenuVisible] = useState(false);
@@ -103,13 +104,30 @@ export default function VillageScreen() {
                     <Image style={{ width: 35, height: 35 }} source={buildingIcons[b.name]} />
                   </View>
                   <View style={{ marginTop: 15, marginLeft: -6 }}>
-                    <View style={{ backgroundColor: "#DCC7A1", paddingRight: 15, paddingLeft: 2, borderTopWidth: 4, borderBottomWidth: 4, borderRightWidth: 4, borderColor: "rgba(107, 57, 0, 0.80)", borderBottomRightRadius: 20 }}>
+                    <View style={{ backgroundColor: "#DCC7A1", paddingRight: 15, paddingLeft: 2, borderTopWidth: 4, borderBottomWidth: 4, borderRightWidth: 4, borderColor: "rgba(107, 57, 0, 0.80)", borderBottomRightRadius: 12 }}>
                       <Countdown finishTime={b.finishTime} />
                     </View>
                   </View>
                 </View>
               ))}
           </View>
+
+
+
+
+          <View style={{ padding: 20, alignItems: "center" }}>
+            <Text style={{color: 'white'}}>Steps during tracking: {isTracking ? currentSteps : "Not tracking"}</Text>
+
+            {!isTracking ? (
+              <>
+                <Button title="Start 1 Hour Tracking" onPress={() => startTracking(1)} />
+                <Button title="Start 2 Hours Tracking" onPress={() => startTracking(2)} />
+              </>
+            ) : (
+              <Text>Tracking in progress...</Text>
+            )}
+          </View>
+
 
 
           {buildSpots.map((spot, index) => {

@@ -55,6 +55,7 @@ const RootLayoutContent = () => {
           require("../assets/images/brickyardIconBlack.png"),
           require("../assets/images/sawmillIconBlack.png"),
           require("../assets/images/ironFoundryIconBlack.png"),
+          require("../assets/images/lockIcon.png")
         ];
 
         await Asset.loadAsync(images); // ✅ Ensures assets are loaded

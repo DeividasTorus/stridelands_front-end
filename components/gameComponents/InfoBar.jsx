@@ -21,6 +21,7 @@ import SlidingModal from "./SlidingModal";
 import { UserContext } from "../../context/UserContext";
 import { GameContext } from "../../context/GameContext";
 import { VillageContext } from "../../context/VillageContext"; // <-- New import
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function InfoBar() {
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
@@ -45,29 +46,40 @@ export default function InfoBar() {
     resources,
     buildMaterialsTotal,
     mails,
-    notifications,
+    notifications, // Use directly from context
     health,
     maxHealth,
     strength,
     levelUpStats,
     credits,
-    setCredits
+    setCredits,
+    setNotifications
   } = useContext(GameContext);
-  // Get the maximum storage capacity from VillageContext
-  const { buildMaterialsMax } = useContext(VillageContext);
 
+  const { buildMaterialsMax } = useContext(VillageContext);
   const [mail, setMail] = useState(mails);
-  const [notification, setNotification] = useState(notifications);
   const [tempCredits, setTempCredits] = useState(credits); // Temporary credits for allocation
 
-  const handleNotificationPress = (notification) => {
-    setNotification((prevNotifications) =>
-      prevNotifications.map((notif) =>
-        notif.id === notification.id ? { ...notif, read: true } : notif
-      )
+  const handleNotificationPress = async (notification) => {
+    // Update the notification as read
+    const updatedNotifications = notifications.map((notif) =>
+      notif.id === notification.id ? { ...notif, read: true } : notif
     );
+
+    setNotifications(updatedNotifications);
+
+    // Persist the updated notifications in AsyncStorage
+    if (user) {
+      try {
+        await AsyncStorage.setItem(`notifications_${user.id}`, JSON.stringify(updatedNotifications));
+      } catch (error) {
+        console.error("Error saving updated notifications:", error);
+      }
+    }
+
     setSelectedNotification(notification);
   };
+
 
   const handleMailPress = (mail) => {
     setMail((prevMails) =>
@@ -173,8 +185,20 @@ export default function InfoBar() {
             <TouchableOpacity style={styles.actionButton} onPress={() => setMailsModalVisible((prev) => !prev)}>
               <Image style={styles.icons} source={require("../../assets/images/mailIcon.png")} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton} onPress={() => setNotificationsModalVisible((prev) => !prev)}>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => setNotificationsModalVisible((prev) => !prev)}
+            >
               <Image style={styles.icons} source={require("../../assets/images/bellIcon.png")} />
+
+              {/* Show badge only if there are unread notifications */}
+              {notifications.some((notif) => !notif.read) && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    {notifications.filter((notif) => !notif.read).length}
+                  </Text>
+                </View>
+              )}
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionButton} onPress={() => setSettingsModalVisible((prev) => !prev)}>
               <Image style={styles.icons} source={require("../../assets/images/setting.png")} />
@@ -287,7 +311,7 @@ export default function InfoBar() {
           <View style={styles.notificationsListContainer}>
             <FlatList
               style={styles.notificationsList}
-              data={notification}
+              data={notifications}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
                 <TouchableOpacity
@@ -554,6 +578,22 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     opacity: 0.8
+  },
+  badge: {
+    position: "absolute",
+    right: -5,
+    top: -5,
+    backgroundColor: "red",
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  badgeText: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold",
   },
   resourcesSection: {
     flexDirection: "row",
