@@ -23,8 +23,9 @@ export const GameProvider = ({ children }) => {
 
     // ✅ Step Tracking State
     const [isTracking, setIsTracking] = useState(false);
-    const [stepsAtStart, setStepsAtStart] = useState(0);
     const [currentSteps, setCurrentSteps] = useState(0);
+    const [stepsAtStart, setStepsAtStart] = useState(null);
+    const [stepCountingDuration, setStepCountingDuration] = useState(10000);
 
     // ✅ User Resources
     const [resources, setResources] = useState({
@@ -261,69 +262,78 @@ export const GameProvider = ({ children }) => {
     //     }
     // };
 
-    const startTracking = async (durationHours) => {
-        const available = await Pedometer.isAvailableAsync();
-        if (!available) {
-            alert("Step tracking is not available on this device.");
+    const startStepCounting = async () => {
+        if (isTracking) return;
+
+        setIsTracking(true);
+
+        // Get the latest step count at the start
+        let initialSteps = currentSteps;
+        setStepsAtStart(initialSteps);
+
+        const isAvailable = await Pedometer.isAvailableAsync();
+        if (!isAvailable) {
+            setIsTracking(false);
             return;
         }
 
-        try {
-            const end = new Date();
-            const start = new Date();
-            start.setHours(start.getHours() - 1);
-            const result = await Pedometer.getStepCountAsync(start, end);
-            const initialSteps = result.steps || 0;
+        // Simulated step counting (incrementing steps every second)
+        let simulatedSteps = initialSteps;
+        const interval = setInterval(() => {
+            simulatedSteps += 10;
+            setCurrentSteps(simulatedSteps);
+        }, 1000);
 
-            setStepsAtStart(initialSteps);
-            setCurrentSteps(initialSteps);
-            setIsTracking(true);
-
-            // Start tracking
-            const subscription = Pedometer.watchStepCount((result) => {
-                setCurrentSteps(result.steps);
-            });
-
-            // Stop tracking automatically after time limit
-            setTimeout(() => stopTracking(subscription), durationHours * 60 * 1000);
-        } catch (error) {
-            console.error("Error starting step tracking:", error);
-        }
+        // Stop tracking after 10 seconds
+         setTimeout(() => {
+        clearInterval(interval);
+        stopStepCounting(simulatedSteps, initialSteps);
+    }, stepCountingDuration);
     };
 
     // ✅ Stop Step Tracking and Convert Steps to Resources
-    const stopTracking = async (subscription) => {
-        if (subscription) subscription.remove();
+    const stopStepCounting = (finalSteps, initialSteps) => {
+        setIsTracking(false);
 
-        const totalSteps = currentSteps - stepsAtStart;
-        if (totalSteps > 0) {
-            const earnedResources = {
-                wood: Math.floor(totalSteps / 1),
-                clay: Math.floor(totalSteps / 1),
-                iron: Math.floor(totalSteps / 1),
-                crop: Math.floor(totalSteps / 1),
-            };
+        // Calculate steps gained
+        const stepsGained = finalSteps - initialSteps;
 
-            const newResources = {
-                ...resources,
-                wood: resources.wood + earnedResources.wood,
-                clay: resources.clay + earnedResources.clay,
-                iron: resources.iron + earnedResources.iron,
-                crop: resources.crop + earnedResources.crop,
-            };
+        if (stepsGained > 0) {
+            setResources(prevResources => {
+                const newResources = {
+                    wood: prevResources.wood + stepsGained * 2,
+                    clay: prevResources.clay + stepsGained * 2,
+                    iron: prevResources.iron + stepsGained + 10,
+                    crop: prevResources.crop + stepsGained + 20,
+                };
 
-            setResources(newResources);
-            await AsyncStorage.setItem(`resources_${user.id}`, JSON.stringify(newResources));
+                const gainedResources = {
+                    wood: stepsGained * 2,
+                    clay: stepsGained * 2,
+                    iron: stepsGained + 10,
+                    crop: stepsGained + 20,
+                };
+
+                if (user) {
+                    AsyncStorage.setItem(`resources_${user.id}`, JSON.stringify(newResources));
+                }
+
+                addNotification(
+                    "🚶 Journey Completed",
+                    `You have traveled ${stepsGained} steps and earned:
+                     🪵 ${gainedResources.wood} wood
+                     🏺 ${gainedResources.clay} clay
+                     ⛏️ ${gainedResources.iron} iron
+                     🌾 ${gainedResources.crop} crop!`,
+                );
+
+                return newResources;
+            });
         }
 
-        setIsTracking(false);
-        setStepsAtStart(0);
+        // Reset for next session
         setCurrentSteps(0);
     };
-
-
-
-
 
 
     return (
@@ -343,7 +353,6 @@ export const GameProvider = ({ children }) => {
                 mails,
                 buildMaterialsTotal,
                 setCredits,
-                updateResources,
                 updateLevel,
                 levelUpStats,
                 gainExperience,
@@ -351,8 +360,10 @@ export const GameProvider = ({ children }) => {
                 setNotifications,
                 isTracking,
                 currentSteps,
-                startTracking,
-                stopTracking,
+                startStepCounting,
+                stopStepCounting,
+                updateResources,
+                stepCountingDuration
             }}
         >
             {children}

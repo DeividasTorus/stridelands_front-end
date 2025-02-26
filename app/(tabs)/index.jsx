@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import TownHallModal from "../../components/buildingsModals/TownHallModal";
 import SlidingModal from "../../components/gameComponents/SlidingModal";
+import ScoutingPostModal from "../../components/buildingsModals/ScoutingPostModal";
 import WarehouseModal from "../../components/buildingsModals/WarehouseModal";
 import { GameContext } from "../../context/GameContext";
 import { VillageContext } from "../../context/VillageContext";
@@ -21,6 +22,7 @@ const { width, height } = Dimensions.get("window");
 
 const buildingIcons = {
   "Town Hall": require("../../assets/images/townHallIcon.png"),
+  "Scouting Post": require("../../assets/images/scoutingPost.png"),
   "Barracks": require("../../assets/images/barracksIcon.png"),
   "Grain Mill": require("../../assets/images/grainMillIcon.png"),
   "Warehouse": require("../../assets/images/wareHouseIcon.png"),
@@ -30,6 +32,7 @@ const buildingIcons = {
 };
 const buildingIconsBlack = {
   "Town Hall": require("../../assets/images/townHallIconBlack.png"),
+  "Scouting Post": require("../../assets/images/scoutingPostBlack.png"),
   "Barracks": require("../../assets/images/barracksIconBlack.png"),
   "Grain Mill": require("../../assets/images/grainMillIconBlack.png"),
   "Warehouse": require("../../assets/images/wareHouseIconBlack.png"),
@@ -43,7 +46,7 @@ export default function VillageScreen() {
   // Get building state and update function from VillageContext.
   const { buildings, updateBuildings, } = useContext(VillageContext);
   // Get resources and XP function from GameContext.
-  const { resources, gainExperience, isTracking, startTracking, currentSteps } = useContext(GameContext);
+  const { resources, gainExperience, } = useContext(GameContext);
 
   const [selectedBuilding, setSelectedBuilding] = useState(null);
   const [buildMenuVisible, setBuildMenuVisible] = useState(false);
@@ -110,22 +113,6 @@ export default function VillageScreen() {
                   </View>
                 </View>
               ))}
-          </View>
-
-
-
-
-          <View style={{ padding: 20, alignItems: "center" }}>
-            <Text style={{color: 'white'}}>Steps during tracking: {isTracking ? currentSteps : "Not tracking"}</Text>
-
-            {!isTracking ? (
-              <>
-                <Button title="Start 1 Hour Tracking" onPress={() => startTracking(1)} />
-                <Button title="Start 2 Hours Tracking" onPress={() => startTracking(2)} />
-              </>
-            ) : (
-              <Text>Tracking in progress...</Text>
-            )}
           </View>
 
 
@@ -249,6 +236,9 @@ export default function VillageScreen() {
 
       {selectedBuilding === "Town Hall" && (
         <TownHallModal isVisible setIsVisible={setSelectedBuilding} />
+      )}
+      {selectedBuilding === "Scouting Post" && (
+        <ScoutingPostModal isVisible setIsVisible={setSelectedBuilding} />
       )}
       {selectedBuilding === "Warehouse" && (
         <WarehouseModal isVisible setIsVisible={setSelectedBuilding} />

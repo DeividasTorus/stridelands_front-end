@@ -7,11 +7,18 @@ const Countdown = ({ finishTime, textStyle }) => {
   );
 
   useEffect(() => {
+    if (finishTime <= Date.now()) {
+      setTimeLeft(0);
+      return;
+    }
+
     const interval = setInterval(() => {
       const secondsLeft = Math.floor((finishTime - Date.now()) / 1000);
       setTimeLeft(secondsLeft > 0 ? secondsLeft : 0);
+
       if (secondsLeft <= 0) clearInterval(interval);
     }, 1000);
+
     return () => clearInterval(interval);
   }, [finishTime]);
 
