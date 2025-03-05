@@ -1,12 +1,12 @@
 import React, { useContext } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image, Button } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import SlidingModal from "../../components/gameComponents/SlidingModal";
+import Countdown from "../gameComponents/Countdown";
 import { VillageContext } from "../../context/VillageContext";
 import { GameContext } from "../../context/GameContext";
 import { UserContext } from "../../context/UserContext";
-import Countdown from "../gameComponents/Countdown";
 
-export default function ScoutingPostModal({ isVisible, setIsVisible }) {
+export default function GrainMillModal({ isVisible, setIsVisible }) {
     // Get building data and update function from VillageContext
     const { buildings, updateBuildings, buildMaterialsMax } = useContext(VillageContext);
     // Get resources, storage capacity values, and XP function from GameContext
@@ -14,44 +14,32 @@ export default function ScoutingPostModal({ isVisible, setIsVisible }) {
     const { user } = useContext(UserContext);
 
     // Find the Warehouse building
-    const scoutingPost = buildings.find((b) => b.name === "Scouting Post");
-    if (!scoutingPost) return null;
-
     const grainMill = buildings.find((b) => b.name === "Grain Mill");
     if (!grainMill) return null;
-    
-    const brickYard = buildings.find((b) => b.name === "Brickyard");
-    if (!brickYard) return null;
-
-    const sawMill = buildings.find((b) => b.name === "Sawmill");
-    if (!sawMill) return null;
-
-    const ironFoundry = buildings.find((b) => b.name === "Iron Foundry");
-    if (!ironFoundry) return null;
 
     // Calculate upgrade cost (20% increase per level)
-    const upgradeCost = scoutingPost?.resourceCost
+    const upgradeCost = grainMill?.resourceCost
         ? {
-            wood: Math.floor(scoutingPost.resourceCost.wood * 1.2),
-            clay: Math.floor(scoutingPost.resourceCost.clay * 1.2),
-            iron: Math.floor(scoutingPost.resourceCost.iron * 1.2),
+            wood: Math.floor(grainMill.resourceCost.wood * 1.2),
+            clay: Math.floor(grainMill.resourceCost.clay * 1.2),
+            iron: Math.floor(grainMill.resourceCost.iron * 1.2),
         }
         : { wood: 0, clay: 0, iron: 0 }; // Default values to prevent errors
 
     const isUpgrading =
-        scoutingPost.underConstruction &&
-        scoutingPost.finishTime &&
-        scoutingPost.finishTime > Date.now();
+        grainMill.underConstruction &&
+        grainMill.finishTime &&
+        grainMill.finishTime > Date.now();
 
     // Find Town Hall
     const townHall = buildings.find((b) => b.name === "Town Hall");
     const townHallLevel = townHall ? townHall.level : 0;
 
     // Get the next upgrade level
-    const nextLevel = scoutingPost.built ? scoutingPost.level + 1 : 1;
+    const nextLevel = grainMill.built ? grainMill.level + 1 : 1;
 
     // Required Town Hall level for the next Warehouse level
-    const requiredTownHallLevel = scoutingPost.upgradeRequirement?.[nextLevel - 1] || 0;
+    const requiredTownHallLevel = grainMill.upgradeRequirement?.[nextLevel - 1] || 0;
 
     // Check if resources are sufficient
     const hasEnoughResources =
@@ -65,95 +53,35 @@ export default function ScoutingPostModal({ isVisible, setIsVisible }) {
     // Final upgrade check: Must have enough resources & correct Town Hall level
     const canUpgrade = hasEnoughResources && meetsTownHallRequirement;
 
-    const formatDuration = (seconds) => {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        return minutes > 0
-            ? `${minutes}m ${remainingSeconds}s`
-            : `${remainingSeconds}s`;
-    };
-
-
-    // If the Scouting Post exists, get its duration, otherwise default to 0
-    const stepDuration = scoutingPost ? scoutingPost.stepCountingDuration : 0;
-
-
     return (
         <SlidingModal isVisible={isVisible} setIsVisible={setIsVisible}>
             <View style={styles.modalContent}>
                 <View style={{ flexDirection: "row" }}>
                     <Image
-                        source={require("../../assets/images/scoutingPost.png")}
+                        source={require("../../assets/images/grainMillIcon.png")}
                         style={styles.buildingIcon}
                     />
                     <View>
-                        <Text style={styles.modalTitle}>Scouting Post</Text>
-                        <Text style={styles.levelText}>Level: {scoutingPost.level}</Text>
+                        <Text style={styles.modalTitle}>Grain Mill</Text>
+                        <Text style={styles.levelText}>Level: {grainMill.level}</Text>
                     </View>
                 </View>
                 <View style={{ alignItems: "center" }}>
                     <View style={styles.infoContainer}>
+                        <Image source={require("../../assets/images/cropsField.png")} style={styles.cropsImage} />
                         <View style={styles.storageContainer}>
-                            <Text style={styles.storageText}>Scouting time</Text>
-                            <Text style={styles.storageNumbers}>{formatDuration(stepDuration)}</Text>
-                        </View>
-                        <View style={{ alignItems: "center", marginTop: 20 }}>
-                            <View style={styles.resourcesContainer}>
-                                <Text style={styles.resourceText}>50 steps = </Text>
-                                <View style={styles.resourceItem}>
-                                    <View style={{ flexDirection: "row" }}>
-                                        <Text style={styles.resourceName}>{sawMill.productionRate}</Text>
-                                        <Image
-                                            source={require("../../assets/images/woodIcon.png")}
-                                            style={styles.resourceIcon}
-                                        />
-                                    </View>
-                                    <View style={{ flexDirection: "row" }}>
-                                        <Text style={styles.resourceName}>{brickYard.productionRate}</Text>
-                                        <Image
-                                            source={require("../../assets/images/bricksIcon.png")}
-                                            style={styles.resourceIcon}
-                                        />
-                                    </View>
-                                    <View style={{ flexDirection: "row" }}>
-                                        <Text style={styles.resourceName}>{ironFoundry.productionRate}</Text>
-                                        <Image
-                                            source={require("../../assets/images/ironIcon.png")}
-                                            style={styles.resourceIcon}
-                                        />
-                                    </View>
-                                    <View style={{ flexDirection: "row" }}>
-                                        <Text style={styles.resourceName}>{grainMill.productionRate}</Text>
-                                        <Image
-                                            source={require("../../assets/images/cropIcon.png")}
-                                            style={styles.resourceIcon}
-                                        />
-                                    </View>
-                                </View>
-                            </View>
-                            <View style={{ alignItems: "center" }}>
-                                <View style={styles.stepsTrackerContainer}>
-                                    <Text style={styles.stepText}>Steps: {currentSteps}</Text>
-                                    <TouchableOpacity
-                                        style={[styles.scoutingButtonContainer, isTracking && styles.disabledButton]}
-                                        onPress={startStepCounting}
-                                        disabled={isTracking}
-                                    >
-                                        {isTracking && finishTime ? (
-                                            <Countdown finishTime={finishTime} textStyle={styles.scoutingText} />
-                                        ) : (
-                                            <Text style={styles.scoutingText}>Start Scouting</Text>
-                                        )}
-                                    </TouchableOpacity>
-                                </View>
+                            <Text style={styles.storageText}>Production Rate</Text>
+                            <View style={{flexDirection: 'row'}}>
+                                <Text style={styles.storageNumbers}>50 steps / {grainMill.productionRate}</Text>
+                                <Image source={require("../../assets/images/cropIcon.png")} style={styles.resourceIcon} />
                             </View>
                         </View>
-                        {scoutingPost.level < 10 ? (
+                        {grainMill.level < 10 ? (
                             <>
-                                <View style={{ alignItems: "center", marginTop: '40' }}>
+                                <View style={{ alignItems: "center", marginTop: '30' }}>
                                     <View style={{ flexDirection: "row", justifyContent: "space-between", width: "99%" }}>
                                         <Text style={styles.upgradeTitle}>Upgrade:</Text>
-                                        <Text style={styles.levelUpCapacityText}>Scouting time 10%</Text>
+                                        <Text style={styles.levelUpCapacityText}>Production Rate 20%</Text>
                                     </View>
                                 </View>
                                 <View style={{ alignItems: "center" }}>
@@ -189,7 +117,7 @@ export default function ScoutingPostModal({ isVisible, setIsVisible }) {
                                             onPress={() => {
                                                 if (!isUpgrading && canUpgrade) {
                                                     // Pass the current warehouse location to preserve it during upgrade.
-                                                    updateBuildings("Scouting Post", scoutingPost.location, resources, gainExperience);
+                                                    updateBuildings("Grain Mill", grainMill.location, resources, gainExperience);
                                                     setIsVisible(false);
                                                 }
                                             }}
@@ -198,7 +126,7 @@ export default function ScoutingPostModal({ isVisible, setIsVisible }) {
                                             <View style={styles.upgradebuttonContainer}>
                                                 {isUpgrading ? (
                                                     <View style={{ alignItems: 'center' }}>
-                                                        <Countdown finishTime={scoutingPost.finishTime} />
+                                                        <Countdown finishTime={grainMill.finishTime} />
                                                     </View>
                                                 ) : (
                                                     <Text style={styles.upgradeButtonText}>
@@ -215,7 +143,7 @@ export default function ScoutingPostModal({ isVisible, setIsVisible }) {
                                 </View>
                             </>
                         ) : (
-                            <Text style={styles.maxLevelText}>🏛 Warehouse is at Max Level</Text>
+                            <Text style={styles.maxLevelText}>🏛 Grain Mill is at Max Level</Text>
                         )}
                     </View>
                 </View>
@@ -257,10 +185,17 @@ const styles = StyleSheet.create({
         width: '94%',
         height: '72%',
     },
+    cropsImage: {
+        width: '100%',
+        height: 120,
+        borderRadius: 5,
+        opacity: 0.9
+    },
     storageContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingHorizontal: 5
+        marginTop: 15,
+        marginHorizontal: 10
     },
     storageText: {
         fontSize: 16,
@@ -317,6 +252,8 @@ const styles = StyleSheet.create({
     resourceIcon: {
         width: 30,
         height: 30,
+        marginTop: -5,
+        marginLeft: -5
     },
     resourceName: {
         fontSize: 14,
@@ -375,5 +312,4 @@ const styles = StyleSheet.create({
         textAlign: "center",
         fontWeight: "bold",
     },
-
 });

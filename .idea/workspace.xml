@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="794f0234-1534-4e4d-b9fd-79d46cf5ef2e" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/index.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/_layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/_layout.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/gameComponents/Countdown.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/gameComponents/Countdown.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/buildingsModals/ScoutingPostModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/buildingsModals/ScoutingPostModal.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/context/GameContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/context/GameContext.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/context/VillageContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/context/VillageContext.jsx" afterDir="false" />
     </list>
@@ -112,6 +113,9 @@
       <workItem from="1740420682444" duration="594000" />
       <workItem from="1740506971255" duration="718000" />
       <workItem from="1740588466564" duration="477000" />
+      <workItem from="1740840206980" duration="424000" />
+      <workItem from="1741117770931" duration="1240000" />
+      <workItem from="1741200783305" duration="382000" />
     </task>
     <servers />
   </component>

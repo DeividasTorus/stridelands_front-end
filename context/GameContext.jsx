@@ -7,6 +7,20 @@ import { Pedometer } from "expo-sensors";
 export const GameContext = createContext();
 
 export const GameProvider = ({ children }) => {
+
+    const [buildings, setBuildings] = useState([
+        { id: 1, name: "Town Hall", level: 0, built: false, location: null, requiredTownHallLevel: 0, resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 10 },
+
+        { id: 2, name: "Scouting Post", level: 0, built: true, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 10, stepCountingDuration: [10, 15, 20, 25] },
+
+        { id: 3, name: "Barracks", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 15 },
+        { id: 4, name: "Grain Mill", level: 0, built: false, location: null, requiredTownHallLevel: 3, upgradeRequirement: [3, 4, 6, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 20, productionRate: 6 },
+        { id: 5, name: "Warehouse", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 5, 6, 12], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 25, baseStorage: 5000 },
+        { id: 6, name: "Brickyard", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 30, productionRate: 6 },
+        { id: 7, name: "Sawmill", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 35, productionRate: 6 },
+        { id: 8, name: "Iron Foundry", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 40, productionRate: 6 },
+    ]);
+
     const { user } = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -21,17 +35,20 @@ export const GameProvider = ({ children }) => {
     const [credits, setCredits] = useState(0);
 
 
+    const [scoutingPostLevel, setScoutingPostLevel] = useState(0);
+    const [stepCountingDuration, setStepCountingDuration] = useState(10); // Default 10s
+
     // ✅ Step Tracking State
     const [isTracking, setIsTracking] = useState(false);
     const [currentSteps, setCurrentSteps] = useState(0);
     const [stepsAtStart, setStepsAtStart] = useState(null);
-    const [stepCountingDuration, setStepCountingDuration] = useState(10000);
+    const [finishTime, setFinishTime] = useState(null); // ✅ Store finish time
 
     // ✅ User Resources
     const [resources, setResources] = useState({
         wood: 5000,
         clay: 3000,
-        iron: 3600,
+        iron: 3000,
         crop: 1000,
     });
 
@@ -68,7 +85,7 @@ export const GameProvider = ({ children }) => {
                     gold: 1000,
                     wood: 5000,
                     clay: 3000,
-                    iron: 3600,
+                    iron: 3000,
                     crop: 1000,
                 });
                 return;
@@ -104,6 +121,20 @@ export const GameProvider = ({ children }) => {
 
         fetchGameData();
     }, [user]);
+
+
+    // ✅ Checking if Sounting Post is built and grow time duration after level up
+
+    useEffect(() => {
+        const scoutingPost = buildings.find((b) => b.name === "Scouting Post");
+        if (scoutingPost && scoutingPost.built) {
+            const level = scoutingPost.level;
+            setScoutingPostLevel(level);
+            setStepCountingDuration(scoutingPost.stepCountingDuration[level] || scoutingPost.stepCountingDuration[scoutingPost.stepCountingDuration.length - 1]);
+        } else {
+            setStepCountingDuration(10); // Default if not built
+        }
+    }, [buildings]);
 
     // ✅ Notifications read status check
 
@@ -265,6 +296,8 @@ export const GameProvider = ({ children }) => {
     const startStepCounting = async () => {
         if (isTracking) return;
 
+        const endTime = Date.now() + stepCountingDuration * 2000;
+        setFinishTime(endTime); // ✅ Set finish time dynamically
         setIsTracking(true);
 
         // Get the latest step count at the start
@@ -284,34 +317,59 @@ export const GameProvider = ({ children }) => {
             setCurrentSteps(simulatedSteps);
         }, 1000);
 
+        // Start pedometer subscription
+        // const subscription = Pedometer.watchStepCount(result => {
+        //     setCurrentSteps(initialSteps + result.steps); // Update current steps based on real step count
+        // });
+
         // Stop tracking after 10 seconds
-         setTimeout(() => {
-        clearInterval(interval);
-        stopStepCounting(simulatedSteps, initialSteps);
-    }, stepCountingDuration);
+        setTimeout(() => {
+            clearInterval(interval);
+            stopStepCounting(simulatedSteps, initialSteps);
+        }, stepCountingDuration * 2000);
+
+        // Stop tracking after the duration
+        // setTimeout(() => {
+        //     subscription?.remove(); // Stop step tracking
+        //     stopStepCounting(currentSteps, initialSteps);
+        // }, stepCountingDuration * 1000);
     };
 
     // ✅ Stop Step Tracking and Convert Steps to Resources
     const stopStepCounting = (finalSteps, initialSteps) => {
         setIsTracking(false);
+        setFinishTime(null); // ✅ Reset finish time
 
         // Calculate steps gained
         const stepsGained = finalSteps - initialSteps;
 
         if (stepsGained > 0) {
             setResources(prevResources => {
+
+                const grainMill = buildings.find((b) => b.name === "Grain Mill");
+                const cropBonus = stepsGained / 50 * grainMill.productionRate
+
+                const brickYard = buildings.find((b) => b.name === "Brickyard");
+                const brickBonus = stepsGained / 50 * brickYard.productionRate
+
+                const sawMill = buildings.find((b) => b.name === "Sawmill");
+                const woodBonus = stepsGained / 50 * sawMill.productionRate
+
+                const ironFoundry = buildings.find((b) => b.name === "Iron Foundry");
+                const ironBonus = stepsGained / 50 * ironFoundry.productionRate
+
                 const newResources = {
-                    wood: prevResources.wood + stepsGained * 2,
-                    clay: prevResources.clay + stepsGained * 2,
-                    iron: prevResources.iron + stepsGained + 10,
-                    crop: prevResources.crop + stepsGained + 20,
+                    wood: prevResources.wood + Math.floor(woodBonus),
+                    clay: prevResources.clay + Math.floor(brickBonus),
+                    iron: prevResources.iron + Math.floor(ironBonus),
+                    crop: prevResources.crop + Math.floor(cropBonus)
                 };
 
                 const gainedResources = {
-                    wood: stepsGained * 2,
-                    clay: stepsGained * 2,
-                    iron: stepsGained + 10,
-                    crop: stepsGained + 20,
+                    wood: Math.floor(woodBonus),
+                    clay: Math.floor(brickBonus),
+                    iron: Math.floor(ironBonus),
+                    crop: Math.floor(cropBonus)
                 };
 
                 if (user) {
@@ -363,7 +421,8 @@ export const GameProvider = ({ children }) => {
                 startStepCounting,
                 stopStepCounting,
                 updateResources,
-                stepCountingDuration
+                stepCountingDuration,
+                finishTime
             }}
         >
             {children}

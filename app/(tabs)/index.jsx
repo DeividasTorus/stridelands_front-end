@@ -17,6 +17,10 @@ import WarehouseModal from "../../components/buildingsModals/WarehouseModal";
 import { GameContext } from "../../context/GameContext";
 import { VillageContext } from "../../context/VillageContext";
 import Countdown from "../../components/gameComponents/Countdown";
+import GrainMillModal from "../../components/buildingsModals/GrainMillModal";
+import BrickYardModal from "../../components/buildingsModals/BrickYardModal";
+import SawMillModal from "../../components/buildingsModals/SawMillModal";
+import IronFoundryModal from "../../components/buildingsModals/IronFoundryModal";
 
 const { width, height } = Dimensions.get("window");
 
@@ -81,12 +85,16 @@ export default function VillageScreen() {
   // Spots where buildings can be placed.
   const buildSpots = [
     { name: "Spot1", top: "47%", left: "49%" },
-    { name: "Spot2", top: "46%", left: "31%" },
+    { name: "Spot2", top: "60%", left: "27%" },
     { name: "Spot3", top: "40%", left: "45%" },
-    { name: "Spot4", top: "42%", left: "71%" },
-    { name: "Spot5", top: "58%", left: "50%" },
-    { name: "Spot6", top: "53%", left: "17%" },
-    { name: "Spot7", top: "49%", left: "71%" },
+    { name: "Spot4", top: "40%", left: "68%" },
+    { name: "Spot5", top: "60%", left: "61%" },
+    { name: "Spot6", top: "54%", left: "17%" },
+    { name: "Spot7", top: "47%", left: "74%" },
+    { name: "Spot8", top: "62%", left: "43%" },
+    { name: "Spot9", top: "47%", left: "15%" },
+    { name: "Spot10", top: "40%", left: "20%" },
+    { name: "Spot11", top: "54%", left: "70%" },
   ];
 
 
@@ -242,6 +250,18 @@ export default function VillageScreen() {
       )}
       {selectedBuilding === "Warehouse" && (
         <WarehouseModal isVisible setIsVisible={setSelectedBuilding} />
+      )}
+      {selectedBuilding === "Grain Mill" && (
+        <GrainMillModal isVisible setIsVisible={setSelectedBuilding} />
+      )}
+      {selectedBuilding === "Brickyard" && (
+        <BrickYardModal isVisible setIsVisible={setSelectedBuilding} />
+      )}
+      {selectedBuilding === "Sawmill" && (
+        <SawMillModal isVisible setIsVisible={setSelectedBuilding} />
+      )}
+      {selectedBuilding === "Iron Foundry" && (
+        <IronFoundryModal isVisible setIsVisible={setSelectedBuilding} />
       )}
     </View>
   );

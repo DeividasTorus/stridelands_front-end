@@ -13,14 +13,14 @@ export const VillageProvider = ({ children }) => {
 
     // Buildings state
     const [buildings, setBuildings] = useState([
-        { id: 1, name: "Town Hall", level: 0, built: false, location: null, requiredTownHallLevel: 0, resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 10 },
-        { id: 1, name: "Scouting Post", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 10 },
-        { id: 2, name: "Barracks", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 15 },
-        { id: 3, name: "Grain Mill", level: 0, built: false, location: null, requiredTownHallLevel: 3, upgradeRequirement: [3, 4, 6, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 20 },
-        { id: 4, name: "Warehouse", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 5, 6, 12], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 25, baseStorage: 5000 },
-        { id: 5, name: "Brickyard", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 30 },
-        { id: 6, name: "Sawmill", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 35 },
-        { id: 7, name: "Iron Foundry", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 40 },
+        { id: 1, name: "Town Hall", level: 0, built: false, location: null, requiredTownHallLevel: 0, resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 3 },
+        { id: 2, name: "Scouting Post", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 2, stepCountingDuration: [10, 15, 20, 25] },
+        { id: 3, name: "Barracks", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 2 },
+        { id: 4, name: "Grain Mill", level: 0, built: false, location: null, requiredTownHallLevel: 3, upgradeRequirement: [3, 4, 6, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2, productionRate: 5 },
+        { id: 5, name: "Warehouse", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 5, 6, 12], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2, baseStorage: 5000 },
+        { id: 6, name: "Brickyard", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 2, productionRate: 5 },
+        { id: 7, name: "Sawmill", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2, productionRate: 5 },
+        { id: 8, name: "Iron Foundry", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2, productionRate: 5 },
     ]);
 
 
@@ -42,14 +42,14 @@ export const VillageProvider = ({ children }) => {
             if (!user) {
                 // Reset to default buildings when user changes
                 setBuildings([
-                    { id: 1, name: "Town Hall", level: 0, built: false, location: null, requiredTownHallLevel: 0, resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 10 },
-                    { id: 1, name: "Scouting Post", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 10 },
-                    { id: 2, name: "Barracks", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 15 },
-                    { id: 3, name: "Grain Mill", level: 0, built: false, location: null, requiredTownHallLevel: 3, upgradeRequirement: [3, 4, 6, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 20 },
-                    { id: 4, name: "Warehouse", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 5, 6, 12], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 25, baseStorage: 5000 },
-                    { id: 5, name: "Brickyard", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 30 },
-                    { id: 6, name: "Sawmill", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 35 },
-                    { id: 7, name: "Iron Foundry", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 40 },
+                    { id: 1, name: "Town Hall", level: 0, built: false, location: null, requiredTownHallLevel: 0, resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 3 },
+                    { id: 2, name: "Scouting Post", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 2, stepCountingDuration: [10, 15, 20, 25] },
+                    { id: 3, name: "Barracks", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 2 },
+                    { id: 4, name: "Grain Mill", level: 0, built: false, location: null, requiredTownHallLevel: 3, upgradeRequirement: [3, 4, 6, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2, productionRate: 5 },
+                    { id: 5, name: "Warehouse", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 5, 6, 12], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2, baseStorage: 5000 },
+                    { id: 6, name: "Brickyard", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 2, productionRate: 5 },
+                    { id: 7, name: "Sawmill", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2, productionRate: 5 },
+                    { id: 8, name: "Iron Foundry", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2, productionRate: 5 },
                 ]);
                 return;
             }
@@ -184,6 +184,33 @@ export const VillageProvider = ({ children }) => {
             setBuildings((prevBuildings) => {
                 const newBuildings = [...prevBuildings];
                 const currentBuilding = newBuildings[buildingIndex];
+
+                // If upgrading Scouting Post, update stepCountingDuration
+                let updatedStepDuration = currentBuilding.stepCountingDuration;
+                if (currentBuilding.name === "Scouting Post" && currentBuilding.stepCountingDuration) {
+                    updatedStepDuration = currentBuilding.stepCountingDuration[nextLevel - 1] || currentBuilding.stepCountingDuration[currentBuilding.stepCountingDuration.length - 1];
+                }
+
+                // If upgrading Grain Mill, update production rate
+                let updatedProduction = currentBuilding.productionRate;
+                if (currentBuilding.name === "Grain Mill") {
+                    updatedProduction = Math.round(currentBuilding.productionRate * Math.pow(1.2, nextLevel));
+                }
+
+                if (currentBuilding.name === "Brickyard") {
+                    updatedProduction = Math.round(currentBuilding.productionRate * Math.pow(1.2, nextLevel));
+                }
+
+                if (currentBuilding.name === "Sawmill") {
+                    updatedProduction = Math.round(currentBuilding.productionRate * Math.pow(1.2, nextLevel));
+                }
+
+                if (currentBuilding.name === "Iron Foundry") {
+                    updatedProduction = Math.round(currentBuilding.productionRate * Math.pow(1.2, nextLevel));
+                }
+
+                
+
                 newBuildings[buildingIndex] = {
                     ...currentBuilding,
                     built: true,
@@ -193,7 +220,11 @@ export const VillageProvider = ({ children }) => {
                     resourceCost: currentBuilding.pendingCost,
                     pendingLevel: undefined,
                     pendingCost: undefined,
+                    stepCountingDuration: updatedStepDuration, // Update step duration for Scouting Post
+                    productionRate: updatedProduction, // ✅ Update Grain Mill production
                 };
+
+                // Persist updated state
                 AsyncStorage.setItem(`buildings_${user.id}`, JSON.stringify(newBuildings));
                 return newBuildings;
             });
@@ -207,6 +238,8 @@ export const VillageProvider = ({ children }) => {
             await gainExperience(xpReward);
         }, building.buildTime * 1000);
     };
+
+
 
 
 
