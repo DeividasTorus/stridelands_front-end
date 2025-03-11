@@ -63,7 +63,13 @@ const RootLayoutContent = () => {
           require("../assets/images/cropsField.png"),
           require("../assets/images/brickYard.png"),
           require("../assets/images/sawMill.png"),
-          require("../assets/images/ironFoundry.png")
+          require("../assets/images/ironFoundry.png"),
+          require("../assets/images/berserkerIcon.png"),
+          require("../assets/images/swordsmanIcon.png"),
+          require("../assets/images/archerIcon.png"),
+          require("../assets/images/knightRaiderIcon.png"),
+          require("../assets/images/academyIcon.png"),
+          require("../assets/images/academyIconBlack.png"),
         ];
 
         await Asset.loadAsync(images); // ✅ Ensures assets are loaded

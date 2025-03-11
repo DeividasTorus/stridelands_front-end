@@ -21,6 +21,8 @@ import GrainMillModal from "../../components/buildingsModals/GrainMillModal";
 import BrickYardModal from "../../components/buildingsModals/BrickYardModal";
 import SawMillModal from "../../components/buildingsModals/SawMillModal";
 import IronFoundryModal from "../../components/buildingsModals/IronFoundryModal";
+import BarracksModal from "../../components/buildingsModals/BarracksModal";
+import AcademyModal from "../../components/buildingsModals/AcademyModal";
 
 const { width, height } = Dimensions.get("window");
 
@@ -33,6 +35,7 @@ const buildingIcons = {
   "Brickyard": require("../../assets/images/brickyardIcon.png"),
   "Sawmill": require("../../assets/images/sawmillIcon.png"),
   "Iron Foundry": require("../../assets/images/ironFoundryIcon.png"),
+  "Academy": require("../../assets/images/academyIcon.png"),
 };
 const buildingIconsBlack = {
   "Town Hall": require("../../assets/images/townHallIconBlack.png"),
@@ -43,6 +46,7 @@ const buildingIconsBlack = {
   "Brickyard": require("../../assets/images/brickyardIconBlack.png"),
   "Sawmill": require("../../assets/images/sawmillIconBlack.png"),
   "Iron Foundry": require("../../assets/images/ironFoundryIconBlack.png"),
+  "Academy": require("../../assets/images/academyIconBlack.png"),
 };
 
 
@@ -262,6 +266,12 @@ export default function VillageScreen() {
       )}
       {selectedBuilding === "Iron Foundry" && (
         <IronFoundryModal isVisible setIsVisible={setSelectedBuilding} />
+      )}
+      {selectedBuilding === "Barracks" && (
+        <BarracksModal isVisible setIsVisible={setSelectedBuilding} />
+      )}
+      {selectedBuilding === "Academy" && (
+        <AcademyModal isVisible setIsVisible={setSelectedBuilding} />
       )}
     </View>
   );
