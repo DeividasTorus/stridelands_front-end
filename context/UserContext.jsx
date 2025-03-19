@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 
 export const UserContext = createContext();
 
@@ -41,17 +42,63 @@ export const UserProvider = ({ children }) => {
     loadUserData();
   }, []);
 
-  const login = async (userData, authToken) => {
+  let API_URL;
+
+  if (Platform.OS === "android") {
+    API_URL = "http://10.0.2.2:5000"; // Android Emulator
+  } else if (Platform.OS === "ios") {
+    API_URL = "http://localhost:3000"; // iOS phone with atomis ip, http://localhost:5000 to ios emulator
+  } else {
+    API_URL = "http://192.168.1.100:5000"; // Replace with your real IP
+  }
+
+  const registerUser = async (username, email, password, tribe) => {
     try {
-      console.log("✅ Logging in...", { userData, authToken });
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password, tribe }),
+      });
 
-      await AsyncStorage.setItem("user", JSON.stringify(userData));
-      await AsyncStorage.setItem("userToken", authToken);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Registration failed");
+      }
 
-      setUser(userData);
-      setToken(authToken);
+      const data = await response.json();
+      console.log("✅ Registration Success:", data);
+
+      return { success: true, user: data.user };
     } catch (error) {
-      console.error("❌ Login Error:", error);
+      console.error("❌ Registration Error:", error.message);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const loginUser = async (email, password) => {
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Login failed");
+      }
+
+      const data = await response.json();
+      console.log("✅ Login Success:", data);
+
+      // Assuming the backend returns a user object and a token
+      setUser(data.user);
+      setToken(data.token);
+
+      return { success: true, user: data.user, token: data.token };
+    } catch (error) {
+      console.error("❌ Login Error:", error.message);
+      return { success: false, error: error.message };
     }
   };
 
@@ -92,7 +139,7 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, token, isLoading, login, logout, updateUser, updateUserAvatar }}>
+    <UserContext.Provider value={{ user, token, isLoading, registerUser, loginUser, logout, updateUser, updateUserAvatar }}>
       {children}
     </UserContext.Provider>
   );

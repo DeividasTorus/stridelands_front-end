@@ -14,7 +14,7 @@ const avatars = [
 
 export default function RegisterScreen() {
   const router = useRouter();
-  const { login } = useContext(UserContext);
+  const { login, registerUser } = useContext(UserContext);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,25 +37,16 @@ export default function RegisterScreen() {
       return;
     }
 
-    // ✅ Convert the selected avatar to a **string URL**
     const avatarUri = RNImage.resolveAssetSource(selectedAvatar).uri;
 
-    // ✅ Store full image URL in AsyncStorage
-    const newUser = {
-      id: Date.now(),
-      name: username,
-      email: email,
-      tribe: selectedTribe,
-      avatar: avatarUri, // ✅ Now stored as a **string**
-    };
+    const result = await registerUser(username, email, password, selectedTribe,);
 
-    const authToken = "valid-token-" + newUser.id;
-
-    // ✅ Store user data in context & AsyncStorage
-    await login(newUser, authToken);
-
-    Alert.alert("Success", "Account created successfully!");
-    router.replace("/(tabs)"); // ✅ Navigate to game screen
+    if (result.success) {
+      Alert.alert("Success", "Account created successfully!");
+      router.replace("/auth/login");
+    } else {
+      Alert.alert("Registration Failed", result.error);
+    }
   };
 
   return (

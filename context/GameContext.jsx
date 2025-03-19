@@ -3,6 +3,7 @@ import React, { createContext, useState, useEffect, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { UserContext } from "./UserContext";
 import { Pedometer } from "expo-sensors";
+import {Platform} from "react-native";
 
 export const GameContext = createContext();
 
@@ -26,9 +27,9 @@ export const GameProvider = ({ children }) => {
 
     // ✅ User Stats
     const [level, setLevel] = useState(1);
-    const [experience, setExperience] = useState(72);
+    const [experience, setExperience] = useState(0);
     const [maxExperience, setMaxExperience] = useState(100);
-    const [health, setHealth] = useState(82);
+    const [health, setHealth] = useState(100);
     const [maxHealth, setMaxHealth] = useState(100);
     const [strength, setStrength] = useState(150);
     const [defense, setDefense] = useState(100);
@@ -64,61 +65,53 @@ export const GameProvider = ({ children }) => {
 
     const buildMaterialsTotal = resources.wood + resources.clay + resources.iron + resources.crop;
 
+    let API_URL;
+
+    if (Platform.OS === "android") {
+        API_URL = "http://10.0.2.2:5000"; // Android Emulator
+    } else if (Platform.OS === "ios") {
+        API_URL = "http://localhost:3000"; // iOS phone with atomis ip, http://localhost:5000 to ios emulator
+    } else {
+        API_URL = "http://192.168.1.100:5000"; // Replace with your real IP
+    }
     // ✅ Fetch user-related data on load
     useEffect(() => {
         const fetchGameData = async () => {
-            if (!user) {
-                // Reset to default stats if no user is logged in
-                setLevel(1);
-                setExperience(72);
-                setMaxExperience(100);
-                setHealth(82);
-                setMaxHealth(100);
-                setStrength(150);
-                setDefense(100);
-                setCredits(0);
-                setIsTracking(false)
-                setStepsAtStart(0)
-                setCurrentSteps(0)
-                setNotifications([])
-                setResources({
-                    gold: 1000,
-                    wood: 5000,
-                    clay: 3000,
-                    iron: 3000,
-                    crop: 1000,
-                });
-                return;
-            }
-
+            if (!user) return;
             try {
                 setIsLoading(true);
-                const storedResources = await AsyncStorage.getItem(`resources_${user.id}`);
-                const storedStats = await AsyncStorage.getItem(`stats_${user.id}`);
-                const storedNotifications = await AsyncStorage.getItem(`notifications_${user.id}`);
-                const storedMails = await AsyncStorage.getItem(`mails_${user.id}`);
 
-                if (storedResources) setResources(JSON.parse(storedResources));
-                if (storedStats) {
-                    const parsedStats = JSON.parse(storedStats);
-                    setLevel(parsedStats.level);
-                    setExperience(parsedStats.experience);
-                    setMaxExperience(parsedStats.maxExperience);
-                    setHealth(parsedStats.health);
-                    setMaxHealth(parsedStats.maxHealth);
-                    setStrength(parsedStats.strength);
-                    setDefense(parsedStats.defense);
-                    setCredits(parsedStats.credits);
+                const response = await fetch(`${API_URL}/user/stats/${user.id}`, {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Failed to fetch user stats");
                 }
-                if (storedNotifications) setNotifications(JSON.parse(storedNotifications));
-                if (storedMails) setMails(JSON.parse(storedMails));
+
+                const data = await response.json();
+
+                // ✅ Update states with fetched data
+                setLevel(data.level);
+                setExperience(data.experience);
+                setMaxExperience(data.maxExperience);
+                setHealth(data.health);
+                setMaxHealth(data.maxHealth);
+                setStrength(data.strength);
+                setDefense(data.defense);
+                setCredits(data.credits);
+                setResources(data.resources);
+                setNotifications(data.notifications || []);
+                setMails(data.mails || []);
+
             } catch (error) {
                 console.error("Error loading game data:", error);
             } finally {
                 setIsLoading(false);
             }
         };
-
         fetchGameData();
     }, [user]);
 
@@ -146,30 +139,30 @@ export const GameProvider = ({ children }) => {
     }, [notifications]);
 
 
-    // ✅ Passive Health Regeneration
-    useEffect(() => {
-        const healthRegen = setInterval(() => {
-            setHealth((prev) => {
-                const newHealth = Math.min(prev + 2, maxHealth);
-                AsyncStorage.setItem(
-                    `stats_${user.id}`,
-                    JSON.stringify({
-                        health: newHealth,
-                        maxHealth,
-                        level,
-                        experience,
-                        maxExperience,
-                        strength,
-                        defense,
-                        credits,
-                    })
-                );
-                return newHealth;
-            });
-        }, 60000);
-
-        return () => clearInterval(healthRegen);
-    }, [maxHealth, user, level, experience, maxExperience, strength, defense, credits]);
+    // // ✅ Passive Health Regeneration
+    // useEffect(() => {
+    //     const healthRegen = setInterval(() => {
+    //         setHealth((prev) => {
+    //             const newHealth = Math.min(prev + 2, maxHealth);
+    //             AsyncStorage.setItem(
+    //                 `stats_${user.id}`,
+    //                 JSON.stringify({
+    //                     health: newHealth,
+    //                     maxHealth,
+    //                     level,
+    //                     experience,
+    //                     maxExperience,
+    //                     strength,
+    //                     defense,
+    //                     credits,
+    //                 })
+    //             );
+    //             return newHealth;
+    //         });
+    //     }, 60000);
+    //
+    //     return () => clearInterval(healthRegen);
+    // }, [maxHealth, user, level, experience, maxExperience, strength, defense, credits]);
 
 
     // ✅ Function to update experience and check for level up
@@ -192,21 +185,33 @@ export const GameProvider = ({ children }) => {
         setCredits(newCredits);
 
         if (user) {
-            await AsyncStorage.setItem(
-                `stats_${user.id}`,
-                JSON.stringify({
-                    level: newLevel,
-                    experience: newXP,
-                    maxExperience: newMaxExperience,
-                    health,
-                    maxHealth,
-                    strength,
-                    defense,
-                    credits: newCredits,
-                })
-            );
+            try {
+                const response = await fetch(`${API_URL}/user/stats/${user.id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        level: newLevel,
+                        experience: newXP,
+                        max_experience: newMaxExperience,
+                        health,
+                        max_health: maxHealth,
+                        strength,
+                        defense,
+                    }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Failed to update user stats");
+                }
+
+                console.log("✅ User stats updated successfully!");
+            } catch (error) {
+                console.error("❌ Error updating user stats:", error.message);
+            }
         }
     };
+
 
     const addNotification = (title, message) => {
         const newNotification = {

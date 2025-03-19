@@ -5,33 +5,29 @@ import { UserContext } from "../../context/UserContext";
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { login } = useContext(UserContext); // ✅ Get login function from context
-  const [username, setUsername] = useState("");
+  const { loginUser } = useContext(UserContext); // ✅ Use real backend login function
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (!username || !password) {
+    if (!email || !password) {
       Alert.alert("Error", "Please fill in both fields.");
       return;
     }
 
-    // ✅ Simulate a valid user (Replace this with real API call)
-    if (username === "testuser" && password === "password") {
-      const userData = {
-        id: 1,
-        name: "Test User",
-        username: username,
-      };
-      const authToken = "valid-token-12345";
+    setLoading(true);
 
-      // ✅ Store user info in context & AsyncStorage
-      await login(userData, authToken);
+    const response = await loginUser(email, password);
 
+    if (response.success) {
       Alert.alert("Success", "Logged in successfully!");
       router.replace("/(tabs)"); // ✅ Navigate to game screen
     } else {
-      Alert.alert("Error", "Invalid username or password.");
+      Alert.alert("Error", response.error || "Invalid email or password.");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -40,10 +36,12 @@ export default function LoginScreen() {
         <Text style={styles.title}>Login</Text>
 
         <TextInput
-          placeholder="Username"
+          placeholder="Email"
           style={styles.input}
-          value={username}
-          onChangeText={setUsername}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
           placeholderTextColor="#000"
         />
         <TextInput
@@ -56,14 +54,12 @@ export default function LoginScreen() {
         />
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>LOG IN</Text>
+          <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+            <Text style={styles.buttonText}>{loading ? "Logging in..." : "LOG IN"}</Text>
           </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          onPress={() => router.push("/auth/register")}
-          style={{ marginTop: 10 }}
-        >
+
+        <TouchableOpacity onPress={() => router.push("/auth/register")} style={{ marginTop: 10 }}>
           <Text style={styles.linkText}>Don't have an account? Sign up now</Text>
         </TouchableOpacity>
       </View>
@@ -132,5 +128,3 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
-
-

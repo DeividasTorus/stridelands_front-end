@@ -364,7 +364,7 @@ export default function InfoBar() {
       <SlidingModal isVisible={userInfoModalVisible} setIsVisible={setUserInfoModalVisible}>
         {currentView === "info" && (
           <>
-            <Text style={styles.modalTitle}>{user.name}</Text>
+            <Text style={styles.modalTitle}>{user.username}</Text>
             <View style={styles.userInfoDetailsContainer}>
               <View style={styles.userInfoDetails}>
                 <View style={{ position: "absolute", right: 55, top: 15 }}>

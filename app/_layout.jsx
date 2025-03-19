@@ -1,10 +1,9 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Stack, useSegments, useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
 import { ActivityIndicator, View } from "react-native";
-import { Asset } from "expo-asset"; // ✅ Added asset loading back
+import { Asset } from "expo-asset";
 import InfoBar from "../components/gameComponents/InfoBar";
 import { Provider } from "react-native-paper";
 import { UserProvider, UserContext } from "../context/UserContext";
@@ -12,12 +11,11 @@ import { GameProvider } from "../context/GameContext";
 import { VillageProvider } from "../context/VillageContext";
 import { AllianceProvider } from "../context/AllianceContext";
 
-// ✅ Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
 const RootLayoutContent = () => {
   const [isAppReady, setAppReady] = useState(false);
-  const { user, isLoading, login } = useContext(UserContext);
+  const { user, isLoading, setUser, setToken } = useContext(UserContext);
   const router = useRouter();
   const segments = useSegments();
 
@@ -26,7 +24,6 @@ const RootLayoutContent = () => {
       try {
         console.log("⏳ Loading assets and user data...");
 
-        // ✅ Load assets before proceeding
         const images = [
           require("../assets/images/villageMap.png"),
           require("../assets/images/barbarian.jpg"),
@@ -75,22 +72,35 @@ const RootLayoutContent = () => {
           require("../assets/images/AllianceHallBlack.png"),
         ];
 
-        await Asset.loadAsync(images); // ✅ Ensures assets are loaded
+        await Asset.loadAsync(images);
         console.log("✅ Assets loaded successfully.");
 
-        // ✅ Load authentication data
-        const storedToken = await AsyncStorage.getItem("userToken");
-        const storedUser = await AsyncStorage.getItem("user");
+        // ✅ Check authentication via backend
+        const checkAuth = async () => {
+          try {
+            const response = await fetch(`${API_URL}/auth/me`, {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${user?.token}`, // Send token for validation
+              },
+            });
 
-        console.log("🔄 On app start, AsyncStorage values:", { storedUser, storedToken });
+            if (!response.ok) throw new Error("Invalid token");
 
-        if (storedToken && storedUser) {
-          login(JSON.parse(storedUser), storedToken);
-        } else {
-          console.log("🚪 No valid user found, clearing invalid token...");
-          await AsyncStorage.removeItem("userToken");
-          await AsyncStorage.removeItem("user");
-        }
+            const data = await response.json();
+            console.log("✅ Authenticated user:", data);
+
+            setUser(data.user);
+            setToken(data.token);
+          } catch (error) {
+            console.log("🚪 No valid session, redirecting to login...");
+            setUser(null);
+            setToken(null);
+          }
+        };
+
+        await checkAuth();
       } catch (error) {
         console.error("❌ Error loading assets or checking auth:", error);
       } finally {
@@ -106,7 +116,7 @@ const RootLayoutContent = () => {
     if (isAppReady && !isLoading) {
       if (!user) {
         console.log("🔄 Redirecting to login screen...");
-        router.replace("/auth"); // ✅ Forces redirect to login
+        router.replace("/auth");
       }
     }
   }, [isAppReady, isLoading, user]);
@@ -137,7 +147,6 @@ const RootLayoutContent = () => {
   );
 };
 
-// ✅ Wrap everything inside UserProvider
 const RootLayout = () => (
   <UserProvider>
     <GameProvider>
@@ -151,16 +160,3 @@ const RootLayout = () => (
 );
 
 export default RootLayout;
-
-
-
-
-
-
-
-
-
-
-
-
-
