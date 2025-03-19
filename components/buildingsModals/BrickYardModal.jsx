@@ -27,9 +27,9 @@ export default function BrickYardModal({ isVisible, setIsVisible }) {
         : { wood: 0, clay: 0, iron: 0 }; // Default values to prevent errors
 
     const isUpgrading =
-    brickYard.underConstruction &&
-    brickYard.finishTime &&
-    brickYard.finishTime > Date.now();
+        brickYard.underConstruction &&
+        brickYard.finishTime &&
+        brickYard.finishTime > Date.now();
 
     // Find Town Hall
     const townHall = buildings.find((b) => b.name === "Town Hall");
@@ -71,7 +71,7 @@ export default function BrickYardModal({ isVisible, setIsVisible }) {
                         <Image source={require("../../assets/images/brickYard.png")} style={styles.cropsImage} />
                         <View style={styles.storageContainer}>
                             <Text style={styles.storageText}>Production Rate</Text>
-                            <View style={{flexDirection: 'row'}}>
+                            <View style={{ flexDirection: 'row' }}>
                                 <Text style={styles.storageNumbers}>50 steps / {brickYard.productionRate}</Text>
                                 <Image source={require("../../assets/images/bricksIcon.png")} style={styles.resourceIcon} />
                             </View>
@@ -159,21 +159,21 @@ const styles = StyleSheet.create({
     buildingIcon: {
         height: 80,
         width: 80,
-        marginTop: 75,
+        marginTop: 25,
         marginLeft: 15,
     },
     modalTitle: {
         fontSize: 30,
-        color: 'rgb(107, 57, 0)',
+        color: "rgb(107, 57, 0)",
         paddingVertical: 3,
-        marginTop: 80,
-        fontWeight: 'bold',
+        marginTop: 30,
+        fontWeight: "bold",
     },
     levelText: {
         fontSize: 18,
         marginLeft: 5,
-        fontWeight: 'bold',
-        color: 'rgba(107, 57, 0, 0.70)',
+        fontWeight: "bold",
+        color: "rgba(107, 57, 0, 0.70)",
     },
     infoContainer: {
         marginTop: 7,
@@ -181,13 +181,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 10,
         borderWidth: 4,
-        borderColor: 'rgba(107, 57, 0, 0.43)',
-        width: '94%',
-        height: '72%',
+        borderColor: "rgba(107, 57, 0, 0.43)",
+        width: "94%",
+        height: "83%",
     },
     cropsImage: {
         width: '100%',
-        height: 120,
+        height: 190,
         borderRadius: 5,
         opacity: 0.9
     },

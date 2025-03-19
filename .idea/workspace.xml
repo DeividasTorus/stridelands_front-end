@@ -5,10 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="794f0234-1534-4e4d-b9fd-79d46cf5ef2e" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(tabs)/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(tabs)/index.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/_layout.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/_layout.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/barracksIcon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/barracksIcon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/images/barracksIconBlack.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/images/barracksIconBlack.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/buildingsModals/AcademyModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/buildingsModals/AcademyModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/buildingsModals/BarracksModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/buildingsModals/BarracksModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/buildingsModals/BrickYardModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/buildingsModals/BrickYardModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/buildingsModals/GrainMillModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/buildingsModals/GrainMillModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/buildingsModals/IronFoundryModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/buildingsModals/IronFoundryModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/buildingsModals/SawMillModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/buildingsModals/SawMillModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/buildingsModals/ScoutingPostModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/buildingsModals/ScoutingPostModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/buildingsModals/TownHallModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/buildingsModals/TownHallModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/buildingsModals/WarehouseModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/buildingsModals/WarehouseModal.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/gameComponents/InfoBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/gameComponents/InfoBar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/gameComponents/SlidingModal.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/gameComponents/SlidingModal.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/context/VillageContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/context/VillageContext.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -116,6 +126,8 @@
       <workItem from="1741117770931" duration="1240000" />
       <workItem from="1741200783305" duration="382000" />
       <workItem from="1741677922763" duration="773000" />
+      <workItem from="1742224603605" duration="276000" />
+      <workItem from="1742365463882" duration="103000" />
     </task>
     <servers />
   </component>

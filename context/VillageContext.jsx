@@ -16,19 +16,20 @@ export const VillageProvider = ({ children }) => {
         { id: 1, name: "Town Hall", level: 0, built: false, location: null, requiredTownHallLevel: 0, resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 3 },
         { id: 2, name: "Scouting Post", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 2, stepCountingDuration: [10, 15, 20, 25] },
         { id: 3, name: "Academy", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 3, 4, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2 },
-        { id: 4, name: "Barracks", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 2, troopsStorage: 200 },
+        { id: 4, name: "Barracks", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 2, troopsStorage: 10 },
         { id: 5, name: "Grain Mill", level: 0, built: false, location: null, requiredTownHallLevel: 3, upgradeRequirement: [3, 4, 6, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2, productionRate: 5 },
         { id: 6, name: "Warehouse", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 5, 6, 12], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2, baseStorage: 5000 },
         { id: 7, name: "Brickyard", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 2, productionRate: 5 },
         { id: 8, name: "Sawmill", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2, productionRate: 5 },
         { id: 9, name: "Iron Foundry", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2, productionRate: 5 },
+        { id: 10, name: "Alliance Hall", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 3, 4, 5], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2 },
     ]);
 
     const [warriors, setWarriors] = useState([
-        { id: 1, name: "Swordsman", level: 1, count: 6, resourceCost: { crop: 5, iron: 2 }, trainingTime: 3, attack: 50, defense: 80, speed: 5, requiredAcademyLevel: 1, upgradeRequirements: [1, 2, 4, 5] },
-        { id: 2, name: "Berserker", level: 1, count: 4, resourceCost: { crop: 7, iron: 4 }, trainingTime: 3, attack: 100, defense: 50, speed: 5, requiredAcademyLevel: 1, upgradeRequirements: [1, 3, 5, 6] },
-        { id: 3, name: "Archer", level: 1, count: 8, resourceCost: { crop: 4, iron: 3 }, trainingTime: 3, attack: 80, defense: 70, speed: 6, requiredAcademyLevel: 1, upgradeRequirements: [1, 2, 4, 6] },
-        { id: 4, name: "Knight Raider", level: 1, count: 11, resourceCost: { crop: 1, iron: 6 }, trainingTime: 4, attack: 120, defense: 50, speed: 12, requiredAcademyLevel: 1, upgradeRequirements: [1, 2, 5, 8] },
+        { id: 1, name: "Swordsman", level: 1, count: 0, resourceCost: { crop: 5, iron: 2 }, trainingCost: { crop: 10, iron: 5 }, trainingTime: 3, upgradingTime: 5, attack: 50, defense: 80, speed: 5, requiredAcademyLevel: 1, upgradeRequirements: [1, 2, 4, 5] },
+        { id: 2, name: "Berserker", level: 1, count: 0, resourceCost: { crop: 7, iron: 4 }, trainingCost: { crop: 13, iron: 9 }, trainingTime: 3, upgradingTime: 5, attack: 100, defense: 50, speed: 5, requiredAcademyLevel: 2, upgradeRequirements: [1, 3, 5, 6] },
+        { id: 3, name: "Archer", level: 1, count: 0, resourceCost: { crop: 4, iron: 3 }, trainingCost: { crop: 9, iron: 4 }, trainingTime: 3, upgradingTime: 5, attack: 80, defense: 70, speed: 6, requiredAcademyLevel: 3, upgradeRequirements: [1, 2, 4, 6] },
+        { id: 4, name: "Knight Raider", level: 1, count: 0, resourceCost: { crop: 1, iron: 6 }, trainingCost: { crop: 14, iron: 20 }, trainingTime: 4, upgradingTime: 5, attack: 120, defense: 50, speed: 12, requiredAcademyLevel: 4, upgradeRequirements: [1, 2, 5, 8] },
     ]);
 
 
@@ -53,7 +54,7 @@ export const VillageProvider = ({ children }) => {
 
     const troopsMax = barracks
         ? Math.round(barracks.troopsStorage * Math.pow(1.2, effectivebarracksLevel))
-        : 200;
+        : 10;
 
     const totalTroops = warriors.reduce((total, warrior) => total + warrior.count, 0);
 
@@ -68,18 +69,19 @@ export const VillageProvider = ({ children }) => {
                     { id: 1, name: "Town Hall", level: 0, built: false, location: null, requiredTownHallLevel: 0, resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 3 },
                     { id: 2, name: "Scouting Post", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 2, stepCountingDuration: [10, 15, 20, 25] },
                     { id: 3, name: "Academy", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 3, 4, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2 },
-                    { id: 4, name: "Barracks", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 2, troopsStorage: 200 },
+                    { id: 4, name: "Barracks", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 2, troopsStorage: 10 },
                     { id: 5, name: "Grain Mill", level: 0, built: false, location: null, requiredTownHallLevel: 3, upgradeRequirement: [3, 4, 6, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2, productionRate: 5 },
                     { id: 6, name: "Warehouse", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 5, 6, 12], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2, baseStorage: 5000 },
                     { id: 7, name: "Brickyard", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 2, productionRate: 5 },
                     { id: 8, name: "Sawmill", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2, productionRate: 5 },
                     { id: 9, name: "Iron Foundry", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2, productionRate: 5 },
+                    { id: 10, name: "Alliance Hall", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 3, 4, 5], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2 },
                 ]);
                 setWarriors([
-                    { id: 1, name: "Swordsman", level: 1, count: 6, resourceCost: { crop: 5, iron: 2 }, trainingTime: 3, attack: 50, defense: 80, speed: 5, requiredAcademyLevel: 1, upgradeRequirements: [1, 2, 4, 5] },
-                    { id: 2, name: "Berserker", level: 1, count: 4, resourceCost: { crop: 7, iron: 4 }, trainingTime: 3, attack: 100, defense: 50, speed: 5, requiredAcademyLevel: 1, upgradeRequirements: [1, 3, 5, 6] },
-                    { id: 3, name: "Archer", level: 1, count: 8, resourceCost: { crop: 4, iron: 3 }, trainingTime: 3, attack: 80, defense: 70, speed: 6, requiredAcademyLevel: 1, upgradeRequirements: [1, 2, 4, 6] },
-                    { id: 4, name: "Knight Raider", level: 1, count: 11, resourceCost: { crop: 1, iron: 6 }, trainingTime: 4, attack: 120, defense: 50, speed: 12, requiredAcademyLevel: 1, upgradeRequirements: [1, 2, 5, 8] },
+                    { id: 1, name: "Swordsman", level: 1, count: 0, resourceCost: { crop: 5, iron: 2 }, trainingCost: { crop: 10, iron: 5 }, trainingTime: 3, upgradingTime: 5, attack: 50, defense: 80, speed: 5, requiredAcademyLevel: 1, upgradeRequirements: [1, 2, 4, 5] },
+                    { id: 2, name: "Berserker", level: 1, count: 0, resourceCost: { crop: 7, iron: 4 }, trainingCost: { crop: 13, iron: 9 }, trainingTime: 3, upgradingTime: 5, attack: 100, defense: 50, speed: 5, requiredAcademyLevel: 2, upgradeRequirements: [1, 3, 5, 6] },
+                    { id: 3, name: "Archer", level: 1, count: 0, resourceCost: { crop: 4, iron: 3 }, trainingCost: { crop: 9, iron: 4 }, trainingTime: 3, upgradingTime: 5, attack: 80, defense: 70, speed: 6, requiredAcademyLevel: 3, upgradeRequirements: [1, 2, 4, 6] },
+                    { id: 4, name: "Knight Raider", level: 1, count: 0, resourceCost: { crop: 1, iron: 6 }, trainingCost: { crop: 14, iron: 20 }, trainingTime: 4, upgradingTime: 5, attack: 120, defense: 50, speed: 12, requiredAcademyLevel: 4, upgradeRequirements: [1, 2, 5, 8] },
                 ]);
                 return;
             }
@@ -147,7 +149,7 @@ export const VillageProvider = ({ children }) => {
 
 
     useEffect(() => {
-        const checkTraining = () => {
+        const checkUpgrading = () => {
             setWarriors((prevWarriors) => {
                 let updated = false;
                 const newWarriors = prevWarriors.map((warrior) => {
@@ -169,10 +171,10 @@ export const VillageProvider = ({ children }) => {
                             defense: Math.round(warrior.defense * 1.2),
                             speed: Math.round(warrior.speed * 1.1),
                             resourceCost: warrior.pendingCost, // Update next level's cost
-                            trainingTime: warrior.pendingTrainingTime, // ✅ Apply increased training time
+                            upgradingTime: warrior.pendingUpgradingTime, // ✅ Apply increased training time
                             pendingLevel: undefined,
                             pendingCost: undefined,
-                            pendingTrainingTime: undefined,
+                            pendingUpgradingTime: undefined,
                         };
                     }
                     return warrior;
@@ -189,13 +191,77 @@ export const VillageProvider = ({ children }) => {
 
         // ✅ Use `setInterval` inside `useEffect`
         const trainingInterval = setInterval(() => {
-            checkTraining();
+            checkUpgrading();
         }, 1000); // Check every second
 
         return () => clearInterval(trainingInterval);
     }, [user]); // Run only when user changes
 
 
+
+    const trainWarrior = async (warriorId, count) => {
+        if (!warriors || !resources || !buildings) {
+            console.error("Missing warriors, resources, or buildings data");
+            return;
+        }
+
+        const warrior = warriors.find((w) => w.id === warriorId);
+        if (!warrior) return;
+
+        const barracks = buildings.find((b) => b.name === "Barracks");
+        const barracksMaxTroops = barracks ? Math.round(barracks.troopsStorage * Math.pow(1.2, barracks.level)) : 200;
+        const totalTroops = warriors.reduce((total, warrior) => total + warrior.count, 0);
+
+        if (totalTroops + count > barracksMaxTroops) {
+            alert("Not enough space in the Barracks!");
+            return;
+        }
+
+        const costMultiplier = Math.pow(1.2, warrior.level);
+        const totalCost = {
+            crop: Math.floor(warrior.trainingCost.crop * costMultiplier * count),
+            iron: Math.floor(warrior.trainingCost.iron * costMultiplier * count),
+        };
+
+        if (resources.crop < totalCost.crop || resources.iron < totalCost.iron) {
+            alert(`Not enough resources to train ${count} ${warrior.name}(s)!`);
+            return;
+        }
+
+        const newResources = {
+            ...resources,
+            crop: resources.crop - totalCost.crop,
+            iron: resources.iron - totalCost.iron,
+        };
+
+        updateResources(newResources);
+
+        const trainQueue = Array(count).fill(warriorId);
+        const trainNext = async () => {
+            // if (trainQueue.length === 0) {
+            //     addNotification("Warrior Training Complete", `${count} ${warrior.name}(s) have been trained!`);
+            //     return;
+            // }
+
+            const nextWarriorId = trainQueue.shift();
+            const nextWarrior = warriors.find((w) => w.id === nextWarriorId);
+            if (!nextWarrior) return;
+
+            setTimeout(async () => {
+                setWarriors((prev) => {
+                    const newWarriors = prev.map((w) =>
+                        w.id === nextWarriorId ? { ...w, count: w.count + 1 } : w
+                    );
+                    AsyncStorage.setItem(`warriors_${user.id}`, JSON.stringify(newWarriors));
+                    return newWarriors;
+                });
+
+                trainNext();
+            }, nextWarrior.trainingTime * 1000);
+        };
+
+        trainNext();
+    };
 
 
     const levelUpWarrior = async (warriorId) => {
@@ -218,11 +284,11 @@ export const VillageProvider = ({ children }) => {
                     }
 
                     // ✅ Training time increases by 20% per level
-                    const newTrainingTime = Math.round(warrior.trainingTime * 1.2);
+                    const newTrainingTime = Math.round(warrior.upgradingTime * 1.2);
 
 
                     // Calculate new resource cost (scaling per level)
-                    const costMultiplier = Math.pow(1.5, nextLevel - 1);
+                    const costMultiplier = Math.pow(1.5, nextLevel);
                     const cost = {
                         crop: Math.floor(warrior.resourceCost.crop * costMultiplier),
                         iron: Math.floor(warrior.resourceCost.iron * costMultiplier),
@@ -253,7 +319,7 @@ export const VillageProvider = ({ children }) => {
                         finishTime,
                         pendingLevel: nextLevel, // Store next level but apply only after countdown
                         pendingCost: cost, // Store new cost for later
-                        pendingTrainingTime: newTrainingTime, // Store new training time for later
+                        pendingUpgradingTime: newTrainingTime, // Store new training time for later
                     };
                 }
                 return warrior;
@@ -411,6 +477,7 @@ export const VillageProvider = ({ children }) => {
                 warriors,
                 updateBuildings,
                 levelUpWarrior, // ✅ Exposing the new function
+                trainWarrior,
             }}
         >
             {children}

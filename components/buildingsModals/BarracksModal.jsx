@@ -186,22 +186,22 @@ const styles = StyleSheet.create({
     buildingIcon: {
         height: 80,
         width: 80,
-        marginTop: 75,
+        marginTop: 25,
         marginLeft: 15,
     },
     modalTitle: {
         fontSize: 30,
-        color: 'rgb(107, 57, 0)',
+        color: "rgb(107, 57, 0)",
         paddingVertical: 3,
         marginLeft: 5,
-        marginTop: 80,
-        fontWeight: 'bold',
+        marginTop: 30,
+        fontWeight: "bold",
     },
     levelText: {
         fontSize: 18,
-        marginLeft: 7,
-        fontWeight: 'bold',
-        color: 'rgba(107, 57, 0, 0.70)',
+        marginLeft: 6,
+        fontWeight: "bold",
+        color: "rgba(107, 57, 0, 0.70)",
     },
     infoContainer: {
         marginTop: 7,
@@ -209,9 +209,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         borderRadius: 10,
         borderWidth: 4,
-        borderColor: 'rgba(107, 57, 0, 0.43)',
-        width: '94%',
-        height: '72%',
+        borderColor: "rgba(107, 57, 0, 0.43)",
+        width: "94%",
+        height: "83%",
     },
     storageContainer: {
         flexDirection: "row",
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: 'rgba(107, 57, 0, 0.43)',
         width: '90%',
-        height: '70%',
+        height: '74%',
         marginTop: 10
     },
     resourceItem: {

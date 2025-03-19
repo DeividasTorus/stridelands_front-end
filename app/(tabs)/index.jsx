@@ -23,6 +23,7 @@ import SawMillModal from "../../components/buildingsModals/SawMillModal";
 import IronFoundryModal from "../../components/buildingsModals/IronFoundryModal";
 import BarracksModal from "../../components/buildingsModals/BarracksModal";
 import AcademyModal from "../../components/buildingsModals/AcademyModal";
+import AllianceHallModal from "../../components/buildingsModals/AllianceHall";
 
 const { width, height } = Dimensions.get("window");
 
@@ -36,6 +37,7 @@ const buildingIcons = {
   "Sawmill": require("../../assets/images/sawmillIcon.png"),
   "Iron Foundry": require("../../assets/images/ironFoundryIcon.png"),
   "Academy": require("../../assets/images/academyIcon.png"),
+  "Alliance Hall": require("../../assets/images/AllianceHall.png"),
 };
 const buildingIconsBlack = {
   "Town Hall": require("../../assets/images/townHallIconBlack.png"),
@@ -47,6 +49,7 @@ const buildingIconsBlack = {
   "Sawmill": require("../../assets/images/sawmillIconBlack.png"),
   "Iron Foundry": require("../../assets/images/ironFoundryIconBlack.png"),
   "Academy": require("../../assets/images/academyIconBlack.png"),
+  "Alliance Hall": require("../../assets/images/AllianceHallBlack.png"),
 };
 
 
@@ -273,6 +276,9 @@ export default function VillageScreen() {
       {selectedBuilding === "Academy" && (
         <AcademyModal isVisible setIsVisible={setSelectedBuilding} />
       )}
+      {selectedBuilding === "Alliance Hall" && (
+        <AllianceHallModal isVisible setIsVisible={setSelectedBuilding} />
+      )}
     </View>
   );
 }
@@ -314,7 +320,7 @@ const styles = StyleSheet.create({
     color: "rgb(107, 57, 0)",
     paddingVertical: 3,
     paddingHorizontal: 30,
-    marginTop: 80,
+    marginTop: 34,
     fontWeight: "bold",
   },
   buildOption: {
@@ -335,7 +341,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: "rgba(107, 57, 0, 0.43)",
     width: "94%",
-    height: "67%",
+    height: "79%",
   },
   buildingText: {
     fontSize: 20,

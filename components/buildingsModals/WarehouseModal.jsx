@@ -202,21 +202,21 @@ const styles = StyleSheet.create({
   buildingIcon: {
     height: 80,
     width: 80,
-    marginTop: 75,
+    marginTop: 25,
     marginLeft: 15,
   },
   modalTitle: {
     fontSize: 30,
-    color: 'rgb(107, 57, 0)',
+    color: "rgb(107, 57, 0)",
     paddingVertical: 3,
-    marginTop: 80,
-    fontWeight: 'bold',
+    marginTop: 30,
+    fontWeight: "bold",
   },
   levelText: {
     fontSize: 18,
     marginLeft: 5,
-    fontWeight: 'bold',
-    color: 'rgba(107, 57, 0, 0.70)',
+    fontWeight: "bold",
+    color: "rgba(107, 57, 0, 0.70)",
   },
   infoContainer: {
     marginTop: 7,
@@ -224,10 +224,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 10,
     borderWidth: 4,
-    borderColor: 'rgba(107, 57, 0, 0.43)',
-    width: '94%',
-    height: '72%',
+    borderColor: "rgba(107, 57, 0, 0.43)",
+    width: "94%",
+    height: "83%",
   },
+
   storageContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -276,7 +277,7 @@ const styles = StyleSheet.create({
   upgradeTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    marginTop: 10,
+    marginTop: 75,
     paddingHorizontal: 5,
     color: 'rgba(107, 57, 0, 0.70)',
   },
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     color: 'rgba(107, 57, 0, 0.70)',
-    marginTop: 12,
+    marginTop: 77,
   },
   upgradeText: {
     fontSize: 16,

@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
     color: "rgb(107, 57, 0)",
     paddingVertical: 3,
     paddingHorizontal: 30,
-    marginTop: 80,
+    marginTop: 35,
     fontWeight: "bold"
   },
   settingsButtons: {
@@ -647,11 +647,15 @@ const styles = StyleSheet.create({
     marginTop: 20
   },
   buttonsContainer: {
-    alignItems: "center",
-    borderWidth: 4,
+    alignItems: 'center',
+    marginTop: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
     borderRadius: 10,
+    borderWidth: 4,
     borderColor: "rgba(107, 57, 0, 0.43)",
-    width: "94%"
+    width: "94%",
+    height: "84%"
   },
   modalButton: {
     backgroundColor: "rgba(182, 135, 81, 0.52)",
@@ -682,7 +686,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: "rgba(107, 57, 0, 0.43)",
     width: "94%",
-    height: "63%"
+    height: "78%"
   },
   notificationItem: {
     marginTop: 5,
@@ -721,7 +725,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: "rgba(107, 57, 0, 0.43)",
     width: "94%",
-    height: "73.4%"
+    height: "84%"
   },
   detailTitle: {
     fontSize: 14,
@@ -765,7 +769,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: "rgba(107, 57, 0, 0.43)",
     width: "94%",
-    height: "73.4%"
+    height: "84%"
   },
   soldierImage: {
     width: 85,
@@ -852,7 +856,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: "rgba(107, 57, 0, 0.43)",
     width: "94%",
-    height: "73.4%"
+    height: "84%"
   },
   creditsText: {
     fontSize: 16,

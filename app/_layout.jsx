@@ -10,6 +10,7 @@ import { Provider } from "react-native-paper";
 import { UserProvider, UserContext } from "../context/UserContext";
 import { GameProvider } from "../context/GameContext";
 import { VillageProvider } from "../context/VillageContext";
+import { AllianceProvider } from "../context/AllianceContext";
 
 // ✅ Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -70,6 +71,8 @@ const RootLayoutContent = () => {
           require("../assets/images/knightRaiderIcon.png"),
           require("../assets/images/academyIcon.png"),
           require("../assets/images/academyIconBlack.png"),
+          require("../assets/images/AllianceHall.png"),
+          require("../assets/images/AllianceHallBlack.png"),
         ];
 
         await Asset.loadAsync(images); // ✅ Ensures assets are loaded
@@ -139,7 +142,9 @@ const RootLayout = () => (
   <UserProvider>
     <GameProvider>
       <VillageProvider>
-        <RootLayoutContent />
+        <AllianceProvider>
+          <RootLayoutContent />
+        </AllianceProvider>
       </VillageProvider>
     </GameProvider>
   </UserProvider>

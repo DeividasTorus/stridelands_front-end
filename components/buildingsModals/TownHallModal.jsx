@@ -98,14 +98,14 @@ const styles = StyleSheet.create({
   buildingIcon: {
     height: 80,
     width: 80,
-    marginTop: 75,
+    marginTop: 25,
     marginLeft: 15,
   },
   modalTitle: {
     fontSize: 30,
     color: "rgb(107, 57, 0)",
     paddingVertical: 3,
-    marginTop: 80,
+    marginTop: 30,
     fontWeight: "bold",
   },
   levelText: {
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     borderColor: "rgba(107, 57, 0, 0.43)",
     width: "94%",
-    height: "72%",
+    height: "83%",
   },
   villageName: {
     textAlign: "center",
