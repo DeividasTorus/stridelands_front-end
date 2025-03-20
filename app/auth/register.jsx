@@ -6,11 +6,11 @@ import { Image as RNImage } from "react-native"; // Required for resolving asset
 
 // ✅ Define avatar options with full paths
 const avatars = [
-  { label: "Barbarian", path: require("../../assets/images/barbarian.jpg") },
-  { label: "Crop", path: require("../../assets/images/cropIcon.png") },
-  { label: "Health", path: require("../../assets/images/healthIcon.png") },
-  { label: "Iron", path: require("../../assets/images/ironIcon.png") },
+  { label: "Barbarian", url: "https://res.cloudinary.com/doccg3qqf/image/upload/v1742474440/barbarian_rzeoqr.jpg" },
+  { label: "Crop", url: "https://res.cloudinary.com/doccg3qqf/image/upload/v1742475819/townHallIcon_jh3kxa.png" },
+
 ];
+
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -20,14 +20,16 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [selectedTribe, setSelectedTribe] = useState(null);
-  const [selectedAvatar, setSelectedAvatar] = useState(avatars[0].path); // Default avatar
+  const [selectedAvatar, setSelectedAvatar] = useState(avatars[0].url);
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
     if (!username || !email || !password || !confirmPassword || !selectedTribe) {
       Alert.alert("Error", "Please fill in all fields.");
       return;
     }
+
     if (password !== confirmPassword) {
       Alert.alert("Error", "Passwords do not match.");
       return;
@@ -37,16 +39,20 @@ export default function RegisterScreen() {
       return;
     }
 
-    const avatarUri = RNImage.resolveAssetSource(selectedAvatar).uri;
+    setLoading(true);
 
-    const result = await registerUser(username, email, password, selectedTribe,);
+    const avatar = selectedAvatar; // ✅ Directly use selectedAvatar instead of resolving it
+
+    const result = await registerUser(username, email, password, selectedTribe, avatar);
 
     if (result.success) {
       Alert.alert("Success", "Account created successfully!");
-      router.replace("/auth/login");
+      router.replace("/(tabs)");
     } else {
       Alert.alert("Registration Failed", result.error);
     }
+
+    setLoading(false);
   };
 
   return (
@@ -58,12 +64,12 @@ export default function RegisterScreen() {
         <Text style={styles.label}>Choose Your Avatar</Text>
         <View style={styles.avatarContainer}>
           {avatars.map((avatar, index) => (
-            <TouchableOpacity key={index} onPress={() => setSelectedAvatar(avatar.path)}>
+            <TouchableOpacity key={index} onPress={() => setSelectedAvatar(avatar.url)}>
               <Image
-                source={avatar.path} // ✅ Use local image source
+                source={{ uri: avatar.url }} // ✅ Use local image source
                 style={[
                   styles.avatar,
-                  selectedAvatar === avatar.path ? styles.selectedAvatar : null,
+                  selectedAvatar === avatar.url ? styles.selectedAvatar : null,
                 ]}
               />
             </TouchableOpacity>
@@ -130,8 +136,8 @@ export default function RegisterScreen() {
         </View>
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleRegister}>
-            <Text style={styles.buttonText}>SIGN UP</Text>
+          <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
+            <Text style={styles.buttonText}>{loading ? "Signing up..." : "SIGN UP"}</Text>
           </TouchableOpacity>
         </View>
         <TouchableOpacity

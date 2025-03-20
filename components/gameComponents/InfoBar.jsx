@@ -60,6 +60,16 @@ export default function InfoBar() {
   const [mail, setMail] = useState(mails);
   const [tempCredits, setTempCredits] = useState(credits); // Temporary credits for allocation
 
+
+  const logoutHandler = async () => {
+    try {
+        await logout(); // ✅ Ensure logout completes before redirecting
+        router.replace("/auth/login"); // ✅ Navigate to login screen
+    } catch (error) {
+        console.error("❌ Logout Error:", error);
+    }
+};
+
   const handleNotificationPress = async (notification) => {
     // Update the notification as read
     const updatedNotifications = notifications.map((notif) =>
@@ -351,7 +361,7 @@ export default function InfoBar() {
                 style={styles.modalButton}
                 onPress={() => {
                   setSettingsModalVisible(false);
-                  logout();
+                  logoutHandler()
                 }}
               >
                 <Text style={styles.modalButtonText}>Logout</Text>

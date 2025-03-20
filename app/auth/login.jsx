@@ -5,7 +5,7 @@ import { UserContext } from "../../context/UserContext";
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { loginUser } = useContext(UserContext); // ✅ Use real backend login function
+  const { loginUser, logoutAsync } = useContext(UserContext); // ✅ Use real backend login function
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,6 +29,8 @@ export default function LoginScreen() {
 
     setLoading(false);
   };
+
+
 
   return (
     <View style={styles.container}>

@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const UserContext = createContext();
 
@@ -9,55 +9,53 @@ export const UserProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  let API_URL;
+  if (Platform.OS === "android") {
+    API_URL = "http://10.0.2.2:3000"; // Android Emulator
+  } else if (Platform.OS === "ios") {
+    API_URL = "http:localhost:3000"; // iOS real device (use local network IP)
+  } else {
+    API_URL = "http://192.168.1.100:5000"; // Replace with your actual server IP
+  }
+
+  // ✅ Load user session from backend on app startup
   useEffect(() => {
-    const loadUserData = async () => {
+    const checkSession = async () => {
       try {
         setIsLoading(true);
-        const storedUser = await AsyncStorage.getItem("user");
-        const storedToken = await AsyncStorage.getItem("userToken");
+        const response = await fetch(`${API_URL}/auth/me`, {
+          method: "GET",
+          credentials: "include", // ✅ Send cookies for authentication
+        });
 
-        if (storedUser && storedToken) {
-          const parsedUser = JSON.parse(storedUser);
-
-          // ✅ If avatar was stored as a string (local require paths or URL), keep it as is
-          if (parsedUser.avatar) {
-            parsedUser.avatar = parsedUser.avatar; // No change needed
-          }
-
-          setUser(parsedUser);
-          setToken(storedToken);
-        } else {
-          await AsyncStorage.removeItem("userToken");
-          await AsyncStorage.removeItem("user");
-          setUser(null);
-          setToken(null);
+        if (!response.ok) {
+          throw new Error("Session expired");
         }
+
+        const data = await response.json();
+        console.log("✅ User session restored:", data);
+        setUser(data.user);
       } catch (error) {
-        console.error("❌ Error loading user data:", error);
+        console.log("🚪 User not logged in or session expired.");
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadUserData();
+    checkSession();
   }, []);
 
-  let API_URL;
-
-  if (Platform.OS === "android") {
-    API_URL = "http://10.0.2.2:5000"; // Android Emulator
-  } else if (Platform.OS === "ios") {
-    API_URL = "http://localhost:3000"; // iOS phone with atomis ip, http://localhost:5000 to ios emulator
-  } else {
-    API_URL = "http://192.168.1.100:5000"; // Replace with your real IP
-  }
-
-  const registerUser = async (username, email, password, tribe) => {
+  // ✅ Register a new user
+  const registerUser = async (username, email, password, tribe, avatar) => {
     try {
+
+      console.log(avatar)
       const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password, tribe }),
+        credentials: "include", // ✅ Ensure cookies are included
+        body: JSON.stringify({ username, email, password, tribe, avatar }),
       });
 
       if (!response.ok) {
@@ -67,6 +65,7 @@ export const UserProvider = ({ children }) => {
 
       const data = await response.json();
       console.log("✅ Registration Success:", data);
+      setUser(data.user); // Automatically log in the user after registration
 
       return { success: true, user: data.user };
     } catch (error) {
@@ -75,11 +74,13 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  // ✅ Log in the user
   const loginUser = async (email, password) => {
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // ✅ Ensure cookies are handled automatically
         body: JSON.stringify({ email, password }),
       });
 
@@ -90,60 +91,57 @@ export const UserProvider = ({ children }) => {
 
       const data = await response.json();
       console.log("✅ Login Success:", data);
+      setUser(data.user); // ✅ Set user from backend response
 
-      // Assuming the backend returns a user object and a token
-      setUser(data.user);
-      setToken(data.token);
-
-      return { success: true, user: data.user, token: data.token };
+      return { success: true, user: data.user };
     } catch (error) {
       console.error("❌ Login Error:", error.message);
       return { success: false, error: error.message };
     }
   };
 
+  // ✅ Log out the user (backend request)
   const logout = async () => {
     try {
       console.log("🚪 Logging out...");
-      await AsyncStorage.removeItem("user");
-      await AsyncStorage.removeItem("userToken");
-      setUser(null);
-      setToken(null);
+
+      const response = await fetch(`${API_URL}/auth/logout`, {
+        method: "POST",
+        credentials: "include", // ✅ Ensure cookies are cleared in backend
+      });
+
+      // ✅ Log the response status for debugging
+      console.log("🔍 Logout Response:", response.status, response.statusText);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("❌ Logout API Error:", errorData);
+        throw new Error(errorData.error || "Logout failed");
+      }
+
+      
+      console.log("✅ Logout successful.");
     } catch (error) {
-      console.error("❌ Logout Error:", error);
+      console.error("❌ Logout Error:", error.message);
     }
   };
 
-  // ✅ Update entire user profile (including avatar)
-  const updateUser = async (updatedUserData) => {
-    try {
-      setUser(updatedUserData);
-      await AsyncStorage.setItem("user", JSON.stringify(updatedUserData));
-    } catch (error) {
-      console.error("❌ Error updating user data:", error);
-    }
-  };
-
-  // ✅ Update only the user's avatar (store full image path)
-  const updateUserAvatar = async (newAvatar) => {
-    try {
-      if (!user) return;
-
-      console.log("🖼 Updating user avatar:", newAvatar);
-      const updatedUser = { ...user, avatar: newAvatar };
-      setUser(updatedUser);
-      await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
-    } catch (error) {
-      console.error("❌ Error updating avatar:", error);
-    }
-  };
 
   return (
-    <UserContext.Provider value={{ user, token, isLoading, registerUser, loginUser, logout, updateUser, updateUserAvatar }}>
+    <UserContext.Provider
+      value={{
+        user,
+        isLoading,
+        registerUser,
+        loginUser,
+        logout,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
 };
+
 
 
 

@@ -102,7 +102,7 @@ const RootLayoutContent = () => {
 
         await checkAuth();
       } catch (error) {
-        console.error("❌ Error loading assets or checking auth:", error);
+        // console.error("❌ Error loading assets or checking auth:", error);
       } finally {
         setAppReady(true);
         await SplashScreen.hideAsync();

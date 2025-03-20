@@ -199,7 +199,7 @@ export default function VillageScreen() {
                                   style={{ height: 30, width: 30 }}
                                 />
                                 <Text style={styles.resourceCost}>
-                                  {building.resourceCost.wood}
+{building?.resourceCost?.wood ?? 0}
                                 </Text>
                               </View>
                               <View style={styles.resourcesCostContainer}>

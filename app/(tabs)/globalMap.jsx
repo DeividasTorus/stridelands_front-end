@@ -94,7 +94,7 @@ export default function App() {
                             <Text style={styles.infoText}>Name: {selectedVillage.name}</Text>
                             <Text style={styles.infoText}>Level: {selectedVillage.level}</Text>
                             <Text style={styles.infoText}>Gold: {selectedVillage.resources.gold}</Text>
-                            <Text style={styles.infoText}>Wood: {selectedVillage.resources.wood}</Text>
+<Text style={styles.infoText}>Wood: {selectedVillage?.resources?.wood || 0}</Text>
                             <Text style={styles.infoText}>Health: {selectedVillage.health}</Text>
                         </View>
                     </Text>

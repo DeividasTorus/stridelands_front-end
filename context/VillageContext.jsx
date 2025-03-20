@@ -13,16 +13,16 @@ export const VillageProvider = ({ children }) => {
 
     // Buildings state
     const [buildings, setBuildings] = useState([
-        { id: 1, name: "Town Hall", level: 0, built: false, location: null, requiredTownHallLevel: 0, resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 3 },
-        { id: 2, name: "Scouting Post", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 2, stepCountingDuration: [10, 15, 20, 25] },
-        { id: 3, name: "Academy", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 3, 4, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2 },
-        { id: 4, name: "Barracks", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 2, troopsStorage: 10 },
-        { id: 5, name: "Grain Mill", level: 0, built: false, location: null, requiredTownHallLevel: 3, upgradeRequirement: [3, 4, 6, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2, productionRate: 5 },
-        { id: 6, name: "Warehouse", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 5, 6, 12], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2, baseStorage: 5000 },
-        { id: 7, name: "Brickyard", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 2, productionRate: 5 },
-        { id: 8, name: "Sawmill", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2, productionRate: 5 },
-        { id: 9, name: "Iron Foundry", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2, productionRate: 5 },
-        { id: 10, name: "Alliance Hall", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 3, 4, 5], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2 },
+        { id: 1, name: "Town Hall", level: 0, built: false, location: null, requiredTownHallLevel: 0, resourceCost: { wood: 100, clay: 100, iron: 50, crop: 0 }, buildTime: 3 },
+        { id: 2, name: "Scouting Post", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 100, clay: 100, iron: 50, crop: 0 }, buildTime: 2, stepCountingDuration: [10, 15, 20, 25] },
+        { id: 3, name: "Academy", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 3, 4, 8], resourceCost: { wood: 50, clay: 50, iron: 20, crop: 0 }, buildTime: 2 },
+        { id: 4, name: "Barracks", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100, crop: 0 }, buildTime: 2, troopsStorage: 10 },
+        { id: 5, name: "Grain Mill", level: 0, built: false, location: null, requiredTownHallLevel: 3, upgradeRequirement: [3, 4, 6, 8], resourceCost: { wood: 50, clay: 50, iron: 20, crop: 0 }, buildTime: 2, productionRate: 5 },
+        { id: 6, name: "Warehouse", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 5, 6, 12], resourceCost: { wood: 300, clay: 250, iron: 200, crop: 0 }, buildTime: 2, baseStorage: 5000 },
+        { id: 7, name: "Brickyard", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100, crop: 0 }, buildTime: 2, productionRate: 5 },
+        { id: 8, name: "Sawmill", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 50, clay: 50, iron: 20, crop: 0 }, buildTime: 2, productionRate: 5 },
+        { id: 9, name: "Iron Foundry", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 300, clay: 250, iron: 200, crop: 0 }, buildTime: 2, productionRate: 5 },
+        { id: 10, name: "Alliance Hall", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 3, 4, 5], resourceCost: { wood: 300, clay: 250, iron: 200, crop: 0 }, buildTime: 2 },
     ]);
 
     const [warriors, setWarriors] = useState([
@@ -66,16 +66,16 @@ export const VillageProvider = ({ children }) => {
             if (!user) {
                 // Reset to default buildings when user changes
                 setBuildings([
-                    { id: 1, name: "Town Hall", level: 0, built: false, location: null, requiredTownHallLevel: 0, resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 3 },
-                    { id: 2, name: "Scouting Post", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 2, stepCountingDuration: [10, 15, 20, 25] },
-                    { id: 3, name: "Academy", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 3, 4, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2 },
-                    { id: 4, name: "Barracks", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 2, troopsStorage: 10 },
-                    { id: 5, name: "Grain Mill", level: 0, built: false, location: null, requiredTownHallLevel: 3, upgradeRequirement: [3, 4, 6, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2, productionRate: 5 },
-                    { id: 6, name: "Warehouse", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 5, 6, 12], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2, baseStorage: 5000 },
-                    { id: 7, name: "Brickyard", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 2, productionRate: 5 },
-                    { id: 8, name: "Sawmill", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 2, productionRate: 5 },
-                    { id: 9, name: "Iron Foundry", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2, productionRate: 5 },
-                    { id: 10, name: "Alliance Hall", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 3, 4, 5], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 2 },
+                    { id: 1, name: "Town Hall", level: 0, built: false, location: null, requiredTownHallLevel: 0, resourceCost: { wood: 100, clay: 100, iron: 50, crop: 0 }, buildTime: 3 },
+                    { id: 2, name: "Scouting Post", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 100, clay: 100, iron: 50, crop: 0 }, buildTime: 2, stepCountingDuration: [10, 15, 20, 25] },
+                    { id: 3, name: "Academy", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 3, 4, 8], resourceCost: { wood: 50, clay: 50, iron: 20, crop: 0 }, buildTime: 2 },
+                    { id: 4, name: "Barracks", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100, crop: 0 }, buildTime: 2, troopsStorage: 10 },
+                    { id: 5, name: "Grain Mill", level: 0, built: false, location: null, requiredTownHallLevel: 3, upgradeRequirement: [3, 4, 6, 8], resourceCost: { wood: 50, clay: 50, iron: 20, crop: 0 }, buildTime: 2, productionRate: 5 },
+                    { id: 6, name: "Warehouse", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 5, 6, 12], resourceCost: { wood: 300, clay: 250, iron: 200, crop: 0 }, buildTime: 2, baseStorage: 5000 },
+                    { id: 7, name: "Brickyard", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100, crop: 0 }, buildTime: 2, productionRate: 5 },
+                    { id: 8, name: "Sawmill", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 50, clay: 50, iron: 20, crop: 0 }, buildTime: 2, productionRate: 5 },
+                    { id: 9, name: "Iron Foundry", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 300, clay: 250, iron: 200, crop: 0 }, buildTime: 2, productionRate: 5 },
+                    { id: 10, name: "Alliance Hall", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 3, 4, 5], resourceCost: { wood: 300, clay: 250, iron: 200, crop: 0 }, buildTime: 2 },
                 ]);
                 setWarriors([
                     { id: 1, name: "Swordsman", level: 1, count: 0, resourceCost: { crop: 5, iron: 2 }, trainingCost: { crop: 10, iron: 5 }, trainingTime: 3, upgradingTime: 5, attack: 50, defense: 80, speed: 5, requiredAcademyLevel: 1, upgradeRequirements: [1, 2, 4, 5] },
@@ -361,13 +361,15 @@ export const VillageProvider = ({ children }) => {
             wood: Math.floor(building.resourceCost.wood * costMultiplier),
             clay: Math.floor(building.resourceCost.clay * costMultiplier),
             iron: Math.floor(building.resourceCost.iron * costMultiplier),
+            crop: Math.floor(building.resourceCost.crop * costMultiplier),
         };
 
         // Check if player has enough resources
         if (
             resources.wood < cost.wood ||
             resources.clay < cost.clay ||
-            resources.iron < cost.iron
+            resources.iron < cost.iron ||
+            resources.crop < cost.crop
         ) {
             alert("Not enough resources!");
             return;
@@ -379,6 +381,7 @@ export const VillageProvider = ({ children }) => {
             wood: resources.wood - cost.wood,
             clay: resources.clay - cost.clay,
             iron: resources.iron - cost.iron,
+            crop: resources.crop - cost.crop,
         });
 
         const finishTime = Date.now() + building.buildTime * 1000;

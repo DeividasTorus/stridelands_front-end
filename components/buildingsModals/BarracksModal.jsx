@@ -20,7 +20,7 @@ export default function BarracksModal({ isVisible, setIsVisible }) {
     // Calculate upgrade cost (20% increase per level)
     const upgradeCost = barracks?.resourceCost
         ? {
-            wood: Math.floor(barracks.resourceCost.wood * 1.2),
+            wood: Math.floor((barracks?.resourceCost?.wood ?? 0) * 1.2),
             clay: Math.floor(barracks.resourceCost.clay * 1.2),
             iron: Math.floor(barracks.resourceCost.iron * 1.2),
         }
@@ -43,9 +43,9 @@ export default function BarracksModal({ isVisible, setIsVisible }) {
 
     // Check if resources are sufficient
     const hasEnoughResources =
-        resources.wood >= upgradeCost.wood &&
-        resources.clay >= upgradeCost.clay &&
-        resources.iron >= upgradeCost.iron;
+        (resources?.wood ?? 0) >= (upgradeCost?.wood ?? 0) &&
+        (resources?.clay ?? 0) >= (upgradeCost?.clay ?? 0) &&
+        (resources?.iron ?? 0) >= (upgradeCost?.iron ?? 0);
 
     // Check if the Town Hall meets the requirement
     const meetsTownHallRequirement = townHallLevel >= requiredTownHallLevel;

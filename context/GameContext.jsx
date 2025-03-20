@@ -3,7 +3,7 @@ import React, { createContext, useState, useEffect, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { UserContext } from "./UserContext";
 import { Pedometer } from "expo-sensors";
-import {Platform} from "react-native";
+import { Platform } from "react-native";
 
 export const GameContext = createContext();
 
@@ -47,10 +47,10 @@ export const GameProvider = ({ children }) => {
 
     // ✅ User Resources
     const [resources, setResources] = useState({
-        wood: 5000,
-        clay: 3000,
-        iron: 3000,
-        crop: 1000,
+        wood: 0,
+        clay: 0,
+        iron: 0,
+        crop: 0,
     });
 
     // ✅ Notifications
@@ -68,9 +68,9 @@ export const GameProvider = ({ children }) => {
     let API_URL;
 
     if (Platform.OS === "android") {
-        API_URL = "http://10.0.2.2:5000"; // Android Emulator
+        API_URL = "http://10.0.2.2:3000"; // Android Emulator
     } else if (Platform.OS === "ios") {
-        API_URL = "http://localhost:3000"; // iOS phone with atomis ip, http://localhost:5000 to ios emulator
+        API_URL = "http://localhost:3000"; // iOS phone with atomis ip, http://localhost:3000 to ios emulator
     } else {
         API_URL = "http://192.168.1.100:5000"; // Replace with your real IP
     }
@@ -81,39 +81,78 @@ export const GameProvider = ({ children }) => {
             try {
                 setIsLoading(true);
 
-                const response = await fetch(`${API_URL}/user/stats/${user.id}`, {
+                // Fetch user stats
+                const statsResponse = await fetch(`${API_URL}/user/stats/${user.id}`, {
                     method: "GET",
                     headers: { "Content-Type": "application/json" },
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || "Failed to fetch user stats");
+                const statsTextResponse = await statsResponse.text(); // Get raw response before parsing JSON
+                console.log("🔍 Raw User Stats API Response:", statsTextResponse);
+
+                if (!statsResponse.ok) {
+                    throw new Error(`Server Error: ${statsResponse.status} ${statsResponse.statusText}`);
                 }
 
-                const data = await response.json();
+                const statsData = JSON.parse(statsTextResponse); // Parse JSON response
+                console.log("✅ Parsed User Stats Data:", statsData);
+
+                // Fetch user resources
+                const resourcesResponse = await fetch(`${API_URL}/user/resources/${user.id}`, {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                });
+
+                const resourcesTextResponse = await resourcesResponse.text();
+                console.log("🔍 Raw Resources API Response:", resourcesTextResponse);
+
+                if (!resourcesResponse.ok) {
+                    throw new Error(`Server Error: ${resourcesResponse.status} ${resourcesResponse.statusText}`);
+                }
+
+                const resourcesData = JSON.parse(resourcesTextResponse);
+                console.log("✅ Parsed Resources Data:", resourcesData);
+
+                // ✅ Update resources state
+                // setResources(resourcesData || {
+                //     wood: 5000,
+                //     clay: 3000,
+                //     iron: 3000,
+                //     crops: 1000,
+                // });
+
+
+                // ✅ Ensure we set the fetched resources
+                setResources(prevResources => ({
+                    ...prevResources,
+                    wood: resourcesData.wood || 0,
+                    clay: resourcesData.clay || 0,
+                    iron: resourcesData.iron || 0,
+                    crop: resourcesData.crops || 0,  // Fix naming mismatch (crops → crop)
+                }));
 
                 // ✅ Update states with fetched data
-                setLevel(data.level);
-                setExperience(data.experience);
-                setMaxExperience(data.maxExperience);
-                setHealth(data.health);
-                setMaxHealth(data.maxHealth);
-                setStrength(data.strength);
-                setDefense(data.defense);
-                setCredits(data.credits);
-                setResources(data.resources);
-                setNotifications(data.notifications || []);
-                setMails(data.mails || []);
+                setLevel(statsData.level);
+                setExperience(statsData.experience);
+                setMaxExperience(statsData.max_experience);
+                setHealth(statsData.health);
+                setMaxHealth(statsData.max_health);
+                setStrength(statsData.strength);
+                setDefense(statsData.defense);
+                setCredits(statsData.credits);
+                setNotifications(statsData.notifications || []);
+                setMails(statsData.mails || []);
 
             } catch (error) {
-                console.error("Error loading game data:", error);
+                console.error("❌ Error loading game data:", error.message);
             } finally {
                 setIsLoading(false);
             }
         };
+
         fetchGameData();
     }, [user]);
+
 
 
     // ✅ Checking if Sounting Post is built and grow time duration after level up
@@ -186,6 +225,7 @@ export const GameProvider = ({ children }) => {
 
         if (user) {
             try {
+
                 const response = await fetch(`${API_URL}/user/stats/${user.id}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
@@ -197,6 +237,7 @@ export const GameProvider = ({ children }) => {
                         max_health: maxHealth,
                         strength,
                         defense,
+                        credits: newCredits
                     }),
                 });
 
@@ -235,10 +276,60 @@ export const GameProvider = ({ children }) => {
     };
 
 
-    const updateResources = async (newResources) => {
-        setResources(newResources);
-        if (user) await AsyncStorage.setItem(`resources_${user.id}`, JSON.stringify(newResources));
+    const updateResources = async (newResources, excludeCrops = false) => {
+        if (!user) return;
+    
+        try {
+            // ✅ Fetch the latest resources from the backend
+            const response = await fetch(`${API_URL}/user/resources/${user.id}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Failed to fetch current resources: ${response.statusText}`);
+            }
+    
+            const currentResources = await response.json();
+            console.log("🔄 Current Resources from DB:", currentResources);
+    
+            // ✅ Merge: Only update changed values, keep others the same
+            const updatedResources = {
+                wood: newResources.wood ?? currentResources.wood,
+                clay: newResources.clay ?? currentResources.clay,
+                iron: newResources.iron ?? currentResources.iron,
+                crops: excludeCrops ? currentResources.crop : (newResources.crop ?? currentResources.crop), 
+                // ✅ Only update crops if not excluded
+            };
+    
+            console.log("🛠 Updating Resources with:", updatedResources);
+    
+            // ✅ Send the updated resources to the backend
+            const updateResponse = await fetch(`${API_URL}/user/resources/${user.id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedResources),
+            });
+    
+            if (!updateResponse.ok) {
+                throw new Error(`Failed to update resources: ${updateResponse.statusText}`);
+            }
+    
+            console.log("✅ Resources updated successfully on the backend");
+    
+            // ✅ Update the local state with the latest values
+            setResources(updatedResources);
+    
+        } catch (error) {
+            console.error("❌ Error updating resources:", error.message);
+        }
     };
+    
+
 
     const updateLevel = async (newLevel, newXP) => {
         setLevel(newLevel);
@@ -256,28 +347,44 @@ export const GameProvider = ({ children }) => {
         const newDefense = defense + (allocatedStats.defense || 0);
         const newCredits = credits - (allocatedStats.strength || 0) - (allocatedStats.defense || 0) - (allocatedStats.resources || 0);
 
-        if (newCredits < 0) return;
+        if (newCredits < 0) return; // Prevent negative credits
 
+        // Update local state
         setStrength(newStrength);
         setDefense(newDefense);
         setCredits(newCredits);
 
+        // Send updated stats to backend
         if (user) {
-            await AsyncStorage.setItem(
-                `stats_${user.id}`,
-                JSON.stringify({
-                    level,
-                    experience,
-                    maxExperience,
-                    health,
-                    maxHealth,
-                    strength: newStrength,
-                    defense: newDefense,
-                    credits: newCredits,
-                })
-            );
+            try {
+                const response = await fetch(`${API_URL}/user/stats/${user.id}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        level,
+                        experience,
+                        max_experience: maxExperience,
+                        health,
+                        max_health: maxHealth,
+                        strength: newStrength,
+                        defense: newDefense,
+                        credits: newCredits
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to update stats on server");
+                }
+
+                console.log("Stats successfully updated on backend");
+            } catch (error) {
+                console.error("Error updating stats:", error);
+            }
         }
     };
+
 
 
     // useEffect(() => {
