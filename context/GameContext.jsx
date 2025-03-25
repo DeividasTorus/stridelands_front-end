@@ -8,22 +8,26 @@ import { Platform } from "react-native";
 export const GameContext = createContext();
 
 export const GameProvider = ({ children }) => {
-
-    const [buildings, setBuildings] = useState([
-        { id: 1, name: "Town Hall", level: 0, built: false, location: null, requiredTownHallLevel: 0, resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 10 },
-
-        { id: 2, name: "Scouting Post", level: 0, built: true, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 100, clay: 100, iron: 50 }, buildTime: 10, stepCountingDuration: [10, 15, 20, 25] },
-
-        { id: 3, name: "Barracks", level: 0, built: false, location: null, requiredTownHallLevel: 2, upgradeRequirement: [2, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 15 },
-        { id: 4, name: "Grain Mill", level: 0, built: false, location: null, requiredTownHallLevel: 3, upgradeRequirement: [3, 4, 6, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 20, productionRate: 6 },
-        { id: 5, name: "Warehouse", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 5, 6, 12], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 25, baseStorage: 5000 },
-        { id: 6, name: "Brickyard", level: 0, built: false, location: null, requiredTownHallLevel: 4, upgradeRequirement: [4, 4, 6, 8], resourceCost: { wood: 200, clay: 150, iron: 100 }, buildTime: 30, productionRate: 6 },
-        { id: 7, name: "Sawmill", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 50, clay: 50, iron: 20 }, buildTime: 35, productionRate: 6 },
-        { id: 8, name: "Iron Foundry", level: 0, built: false, location: null, requiredTownHallLevel: 5, upgradeRequirement: [5, 6, 7, 8], resourceCost: { wood: 300, clay: 250, iron: 200 }, buildTime: 40, productionRate: 6 },
-    ]);
-
+    const baseBuildingData = {
+        "Warehouse": { baseStorage: 5000 },
+        "Barracks": { troopsStorage: 10 },
+        "Scouting Post": { stepCountingDuration: [60, 90, 120, 150, 180, 210] },
+        "Grain Mill": { productionRate: 5, },
+        "Sawmill": { productionRate: 5, },
+        "Brickyard": { productionRate: 5, },
+        "Iron Foundry": { productionRate: 5, },
+    };
+    const [buildings, setBuildings] = useState([]);
     const { user } = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(true);
+
+    const [userSteps, setUserSteps] = useState({
+        is_tracking: false,
+        stepsGained: 0,
+        totalSteps: 0,
+        steps_at_session_start: 0,
+    });
+
 
     // ✅ User Stats
     const [level, setLevel] = useState(1);
@@ -50,7 +54,7 @@ export const GameProvider = ({ children }) => {
         wood: 0,
         clay: 0,
         iron: 0,
-        crop: 0,
+        crops: 0,
     });
 
     // ✅ Notifications
@@ -63,75 +67,89 @@ export const GameProvider = ({ children }) => {
         { id: 3, title: "Games begins", sender: "StrideLands", message: "Reminder: Team meeting at 3 PM. Don't be late!", time: "Monday", read: false },
     ]);
 
-    const buildMaterialsTotal = resources.wood + resources.clay + resources.iron + resources.crop;
+    const toCamelCaseKeys = (obj) => {
+        if (!obj || typeof obj !== "object" || Array.isArray(obj)) return obj;
+        return Object.fromEntries(
+            Object.entries(obj).map(([key, value]) => [
+                key.replace(/_([a-z])/g, (_, char) => char.toUpperCase()),
+                toCamelCaseKeys(value),
+            ])
+        );
+    };
+
+    function calculateBuildingDynamicValues(building, baseData) {
+        const level = building.level ?? 0;
+        let updatedProduction = baseData.productionRate ?? 0;
+
+        if (["Grain Mill", "Brickyard", "Sawmill", "Iron Foundry"].includes(building.name)) {
+            updatedProduction = Math.round(updatedProduction * Math.pow(1.2, level));
+        }
+
+        let updatedStepDuration;
+        if (building.name === "Scouting Post") {
+            const durationArray = baseData.stepCountingDuration ?? [60, 90, 120, 150];
+            updatedStepDuration = durationArray[level - 1] ?? durationArray.at(-1) ?? 60;
+        }
+
+        return {
+            productionRate: updatedProduction,
+            stepCountingDuration: updatedStepDuration,
+        };
+    }
+
+    const buildMaterialsTotal = resources.wood + resources.clay + resources.iron + resources.crops;
 
     let API_URL;
 
     if (Platform.OS === "android") {
         API_URL = "http://10.0.2.2:3000"; // Android Emulator
     } else if (Platform.OS === "ios") {
-        API_URL = "http://localhost:3000"; // iOS phone with atomis ip, http://localhost:3000 to ios emulator
+        // API_URL = "http://192.168.1.107:3000"; // iOS phone with atomis ip, http://localhost:3000 to ios emulator
+        API_URL = "http://192.168.0.75:3000";
     } else {
-        API_URL = "http://192.168.1.100:5000"; // Replace with your real IP
+        API_URL = "http://192.168.0.75:3000"; // Replace with your real IP
     }
     // ✅ Fetch user-related data on load
     useEffect(() => {
         const fetchGameData = async () => {
             if (!user) return;
+
             try {
                 setIsLoading(true);
 
                 // Fetch user stats
-                const statsResponse = await fetch(`${API_URL}/user/stats/${user.id}`, {
-                    method: "GET",
-                    headers: { "Content-Type": "application/json" },
-                });
-
-                const statsTextResponse = await statsResponse.text(); // Get raw response before parsing JSON
-                console.log("🔍 Raw User Stats API Response:", statsTextResponse);
+                const statsResponse = await fetch(`${API_URL}/user/stats/${user.id}`);
+                const statsText = await statsResponse.text();
+                console.log("🔍 Raw User Stats:", statsText);
 
                 if (!statsResponse.ok) {
-                    throw new Error(`Server Error: ${statsResponse.status} ${statsResponse.statusText}`);
+                    throw new Error(`Stats Error: ${statsResponse.status} ${statsResponse.statusText}`);
                 }
 
-                const statsData = JSON.parse(statsTextResponse); // Parse JSON response
-                console.log("✅ Parsed User Stats Data:", statsData);
+                const statsData = JSON.parse(statsText);
+                console.log("✅ Parsed User Stats:", statsData);
 
                 // Fetch user resources
-                const resourcesResponse = await fetch(`${API_URL}/user/resources/${user.id}`, {
-                    method: "GET",
-                    headers: { "Content-Type": "application/json" },
-                });
-
-                const resourcesTextResponse = await resourcesResponse.text();
-                console.log("🔍 Raw Resources API Response:", resourcesTextResponse);
+                const resourcesResponse = await fetch(`${API_URL}/user/resources/${user.id}`);
+                const resourcesText = await resourcesResponse.text();
+                console.log("🔍 Raw Resources:", resourcesText);
 
                 if (!resourcesResponse.ok) {
-                    throw new Error(`Server Error: ${resourcesResponse.status} ${resourcesResponse.statusText}`);
+                    throw new Error(`Resources Error: ${resourcesResponse.status} ${resourcesResponse.statusText}`);
                 }
 
-                const resourcesData = JSON.parse(resourcesTextResponse);
-                console.log("✅ Parsed Resources Data:", resourcesData);
+                const resourcesData = JSON.parse(resourcesText);
+                console.log("✅ Parsed Resources:", resourcesData);
 
-                // ✅ Update resources state
-                // setResources(resourcesData || {
-                //     wood: 5000,
-                //     clay: 3000,
-                //     iron: 3000,
-                //     crops: 1000,
-                // });
-
-
-                // ✅ Ensure we set the fetched resources
-                setResources(prevResources => ({
-                    ...prevResources,
+                // ✅ Set resources
+                setResources({
                     wood: resourcesData.wood || 0,
                     clay: resourcesData.clay || 0,
                     iron: resourcesData.iron || 0,
-                    crop: resourcesData.crops || 0,  // Fix naming mismatch (crops → crop)
-                }));
+                    crops: resourcesData.crops || 0,
+                });
 
-                // ✅ Update states with fetched data
+                // ✅ Set stats
                 setLevel(statsData.level);
                 setExperience(statsData.experience);
                 setMaxExperience(statsData.max_experience);
@@ -142,6 +160,31 @@ export const GameProvider = ({ children }) => {
                 setCredits(statsData.credits);
                 setNotifications(statsData.notifications || []);
                 setMails(statsData.mails || []);
+
+                // ✅ Fetch and enrich buildings
+                const buildingsResponse = await fetch(`${API_URL}/user/buildings/${user.id}`);
+                const buildingsData = await buildingsResponse.json();
+
+                const camelBuildings = buildingsData.map(toCamelCaseKeys);
+
+                const enrichedBuildings = camelBuildings.map((building) => {
+                    const baseData = baseBuildingData[building.name] || {};
+                    const dynamicValues = calculateBuildingDynamicValues(building, baseData);
+                    return {
+                        ...building,
+                        ...baseData,
+                        ...dynamicValues,
+                    };
+                });
+
+                setBuildings(enrichedBuildings);
+
+                // 🔁 Fetch step tracking data
+                const stepRes = await fetch(`${API_URL}/user/steps/${user.id}`);
+                const stepData = await stepRes.json();
+                setUserSteps(stepData);
+                setIsTracking(stepData.is_tracking || false);
+
 
             } catch (error) {
                 console.error("❌ Error loading game data:", error.message);
@@ -155,18 +198,31 @@ export const GameProvider = ({ children }) => {
 
 
 
+
     // ✅ Checking if Sounting Post is built and grow time duration after level up
 
     useEffect(() => {
         const scoutingPost = buildings.find((b) => b.name === "Scouting Post");
+
         if (scoutingPost && scoutingPost.built) {
-            const level = scoutingPost.level;
+            const level = scoutingPost.level ?? 0;
             setScoutingPostLevel(level);
-            setStepCountingDuration(scoutingPost.stepCountingDuration[level] || scoutingPost.stepCountingDuration[scoutingPost.stepCountingDuration.length - 1]);
+
+            const defaultDurations = [60, 90, 120, 150, 180, 210];
+            const durationArray = Array.isArray(scoutingPost.stepCountingDuration)
+                ? scoutingPost.stepCountingDuration
+                : defaultDurations;
+
+            const duration = durationArray[level - 1] ?? durationArray.at(-1) ?? 10;
+
+            setStepCountingDuration(duration);
         } else {
-            setStepCountingDuration(10); // Default if not built
+            setStepCountingDuration(10);
         }
     }, [buildings]);
+
+
+
 
     // ✅ Notifications read status check
 
@@ -278,7 +334,7 @@ export const GameProvider = ({ children }) => {
 
     const updateResources = async (newResources, excludeCrops = false) => {
         if (!user) return;
-    
+
         try {
             // ✅ Fetch the latest resources from the backend
             const response = await fetch(`${API_URL}/user/resources/${user.id}`, {
@@ -287,25 +343,25 @@ export const GameProvider = ({ children }) => {
                     "Content-Type": "application/json",
                 },
             });
-    
+
             if (!response.ok) {
                 throw new Error(`Failed to fetch current resources: ${response.statusText}`);
             }
-    
+
             const currentResources = await response.json();
             console.log("🔄 Current Resources from DB:", currentResources);
-    
+
             // ✅ Merge: Only update changed values, keep others the same
             const updatedResources = {
                 wood: newResources.wood ?? currentResources.wood,
                 clay: newResources.clay ?? currentResources.clay,
                 iron: newResources.iron ?? currentResources.iron,
-                crops: excludeCrops ? currentResources.crop : (newResources.crop ?? currentResources.crop), 
+                crops: newResources.crops ?? currentResources.crops,
                 // ✅ Only update crops if not excluded
             };
-    
+
             console.log("🛠 Updating Resources with:", updatedResources);
-    
+
             // ✅ Send the updated resources to the backend
             const updateResponse = await fetch(`${API_URL}/user/resources/${user.id}`, {
                 method: "PUT",
@@ -314,21 +370,21 @@ export const GameProvider = ({ children }) => {
                 },
                 body: JSON.stringify(updatedResources),
             });
-    
+
             if (!updateResponse.ok) {
                 throw new Error(`Failed to update resources: ${updateResponse.statusText}`);
             }
-    
+
             console.log("✅ Resources updated successfully on the backend");
-    
+
             // ✅ Update the local state with the latest values
             setResources(updatedResources);
-    
+
         } catch (error) {
             console.error("❌ Error updating resources:", error.message);
         }
     };
-    
+
 
 
     const updateLevel = async (newLevel, newXP) => {
@@ -406,39 +462,72 @@ export const GameProvider = ({ children }) => {
     // };
 
     const startStepCounting = async () => {
-        if (isTracking) return;
+        if (isTracking || !user) return;
 
-        const endTime = Date.now() + stepCountingDuration * 2000;
-        setFinishTime(endTime); // ✅ Set finish time dynamically
+        const currentStepCount = currentSteps; // or fetch from pedometer if using real device
+
+        try {
+            const response = await fetch(`${API_URL}/user/steps/${user.id}/start`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ currentStepCount }),
+            });
+
+            if (!response.ok) throw new Error("Failed to start step tracking");
+
+            const stepData = await response.json();
+            setUserSteps(stepData.userSteps);
+            setStepsAtStart(currentStepCount);
+            setIsTracking(true);
+        } catch (error) {
+            console.error("❌ Start Step Tracking Error:", error);
+        }
+
+        const scoutingPost = buildings.find((b) => b.name === "Scouting Post" && b.built);
+
+        let dynamicDuration = 60;
+        const defaultDurations = [60, 90, 120, 150, 180, 210];
+
+        if (scoutingPost) {
+            const level = scoutingPost.level ?? 1;
+            const durationArray = Array.isArray(scoutingPost.stepCountingDuration)
+                ? scoutingPost.stepCountingDuration
+                : defaultDurations;
+
+            dynamicDuration = durationArray[level - 1] ?? durationArray.at(-1) ?? 60;
+        }
+
+        const durationInMs = dynamicDuration * 1000;
+        const endTime = Date.now() + durationInMs;
+
+        setFinishTime(endTime);
         setIsTracking(true);
-
-        // Get the latest step count at the start
-        let initialSteps = currentSteps;
-        setStepsAtStart(initialSteps);
+        setStepsAtStart(currentSteps);
 
         const isAvailable = await Pedometer.isAvailableAsync();
         if (!isAvailable) {
+            console.warn("Pedometer not available.");
             setIsTracking(false);
             return;
         }
 
-        // Simulated step counting (incrementing steps every second)
-        let simulatedSteps = initialSteps;
+        // Simulate steps
+        let simulatedSteps = currentSteps;
         const interval = setInterval(() => {
             simulatedSteps += 10;
             setCurrentSteps(simulatedSteps);
         }, 1000);
 
+        setTimeout(() => {
+            clearInterval(interval);
+            stopStepCounting(simulatedSteps, currentSteps);
+        }, durationInMs);
+
+
         // Start pedometer subscription
         // const subscription = Pedometer.watchStepCount(result => {
         //     setCurrentSteps(initialSteps + result.steps); // Update current steps based on real step count
         // });
-
-        // Stop tracking after 10 seconds
-        setTimeout(() => {
-            clearInterval(interval);
-            stopStepCounting(simulatedSteps, initialSteps);
-        }, stepCountingDuration * 2000);
 
         // Stop tracking after the duration
         // setTimeout(() => {
@@ -447,63 +536,70 @@ export const GameProvider = ({ children }) => {
         // }, stepCountingDuration * 1000);
     };
 
+
+
     // ✅ Stop Step Tracking and Convert Steps to Resources
     const stopStepCounting = (finalSteps, initialSteps) => {
         setIsTracking(false);
-        setFinishTime(null); // ✅ Reset finish time
+        setFinishTime(null);
 
-        // Calculate steps gained
         const stepsGained = finalSteps - initialSteps;
+        if (stepsGained <= 0) return;
 
-        if (stepsGained > 0) {
-            setResources(prevResources => {
+        let newResources = {};
 
-                const grainMill = buildings.find((b) => b.name === "Grain Mill");
-                const cropBonus = stepsGained / 50 * grainMill.productionRate
+        setResources((prev) => {
+            const getRate = (name) => {
+                const b = buildings.find((b) => b.name === name && b.built);
+                return isNaN(Number(b?.productionRate)) ? 1 : Number(b.productionRate);
+            };
 
-                const brickYard = buildings.find((b) => b.name === "Brickyard");
-                const brickBonus = stepsGained / 50 * brickYard.productionRate
+            const cropBonus = stepsGained / 50 * getRate("Grain Mill");
+            const brickBonus = stepsGained / 50 * getRate("Brickyard");
+            const woodBonus = stepsGained / 50 * getRate("Sawmill");
+            const ironBonus = stepsGained / 50 * getRate("Iron Foundry");
 
-                const sawMill = buildings.find((b) => b.name === "Sawmill");
-                const woodBonus = stepsGained / 50 * sawMill.productionRate
+            newResources = {
+                wood: prev.wood + Math.floor(woodBonus),
+                clay: prev.clay + Math.floor(brickBonus),
+                iron: prev.iron + Math.floor(ironBonus),
+                crops: prev.crops + Math.floor(cropBonus),
+            };
 
-                const ironFoundry = buildings.find((b) => b.name === "Iron Foundry");
-                const ironBonus = stepsGained / 50 * ironFoundry.productionRate
+            updateResources(newResources);
 
-                const newResources = {
-                    wood: prevResources.wood + Math.floor(woodBonus),
-                    clay: prevResources.clay + Math.floor(brickBonus),
-                    iron: prevResources.iron + Math.floor(ironBonus),
-                    crop: prevResources.crop + Math.floor(cropBonus)
-                };
+            addNotification(
+                "🚶 Journey Completed",
+                `You traveled ${stepsGained} steps and earned:\n🪵 ${Math.floor(woodBonus)} wood\n🏺 ${Math.floor(brickBonus)} clay\n⛏️ ${Math.floor(ironBonus)} iron\n🌾 ${Math.floor(cropBonus)} crop!`
+            );
 
-                const gainedResources = {
-                    wood: Math.floor(woodBonus),
-                    clay: Math.floor(brickBonus),
-                    iron: Math.floor(ironBonus),
-                    crop: Math.floor(cropBonus)
-                };
+            return newResources;
+        });
 
-                if (user) {
-                    AsyncStorage.setItem(`resources_${user.id}`, JSON.stringify(newResources));
-                }
+        // ✅ Update on server too
+        if (user) {
 
-                addNotification(
-                    "🚶 Journey Completed",
-                    `You have traveled ${stepsGained} steps and earned:
-                     🪵 ${gainedResources.wood} wood
-                     🏺 ${gainedResources.clay} clay
-                     ⛏️ ${gainedResources.iron} iron
-                     🌾 ${gainedResources.crop} crop!`,
-                );
 
-                return newResources;
-            });
+            fetch(`${API_URL}/user/steps/${user.id}/stop`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ currentStepCount: finalSteps }),
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log("✅ Step tracking stopped on backend:", data);
+                })
+                .catch((error) => {
+                    console.error("❌ Failed to stop tracking on backend:", error);
+                });
         }
 
-        // Reset for next session
         setCurrentSteps(0);
     };
+
+
 
 
     return (

@@ -18,6 +18,7 @@ const { height, width } = Dimensions.get("window");
 const SlidingModal = ({ isVisible, setIsVisible, children }) => {
   const opacityAnim = useRef(new Animated.Value(0)).current;
 
+  
   useEffect(() => {
     if (isVisible) {
       Animated.timing(opacityAnim, {

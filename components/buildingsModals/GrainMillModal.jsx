@@ -117,7 +117,7 @@ export default function GrainMillModal({ isVisible, setIsVisible }) {
                                             onPress={() => {
                                                 if (!isUpgrading && canUpgrade) {
                                                     // Pass the current warehouse location to preserve it during upgrade.
-                                                    updateBuildings("Grain Mill", grainMill.location, resources, gainExperience);
+                                                    updateBuildings(grainMill, grainMill.location);
                                                     setIsVisible(false);
                                                 }
                                             }}

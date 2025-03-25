@@ -15,10 +15,18 @@ export default function TownHallModal({ isVisible, setIsVisible }) {
   if (!townHall) return null;
 
   const upgradeCost = {
-    wood: Math.floor(townHall.resourceCost.wood * 1.2),
-    clay: Math.floor(townHall.resourceCost.clay * 1.2),
-    iron: Math.floor(townHall.resourceCost.iron * 1.2),
+    wood: Math.floor((townHall?.resourceCost?.wood ?? 0) * 1.2),
+    clay: Math.floor((townHall?.resourceCost?.clay ?? 0) * 1.2),
+    iron: Math.floor((townHall?.resourceCost?.iron ?? 0) * 1.2),
   };
+
+  const handleUpgrade = (building) => {
+    if (!building.underConstruction && canUpgrade) {
+      updateBuildings(building, building.location);
+      setIsVisible(false);
+    }
+  };
+
 
   const canUpgrade =
     resources.wood >= upgradeCost.wood &&
@@ -66,7 +74,7 @@ export default function TownHallModal({ isVisible, setIsVisible }) {
                   ]}
                   onPress={() => {
                     if (!isUpgrading && canUpgrade) {
-                      updateBuildings("Town Hall", townHall.location, resources, gainExperience);
+                      handleUpgrade(townHall)
                       setIsVisible(false);
                     }
                   }}

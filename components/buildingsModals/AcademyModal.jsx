@@ -132,12 +132,12 @@ export default function AcademyModal({ isVisible, setIsVisible }) {
 
     // ✅ Check if player has enough resources for warrior upgrade
     const upgradeWarriorCost = {
-        crop: Math.floor(selectedWarrior?.resourceCost.crop * Math.pow(1.5, nextWarriorLevel)),
+        crops: Math.floor(selectedWarrior?.resourceCost.crops * Math.pow(1.5, nextWarriorLevel)),
         iron: Math.floor(selectedWarrior?.resourceCost.iron * Math.pow(1.5, nextWarriorLevel)),
     };
 
     const hasEnoughWarriorResources =
-        resources.crop >= upgradeWarriorCost.crop &&
+        resources.crops >= upgradeWarriorCost.crops &&
         resources.iron >= upgradeWarriorCost.iron;
 
     // ✅ Final condition: Can only upgrade if Academy level is high enough and resources are enough
@@ -212,7 +212,7 @@ export default function AcademyModal({ isVisible, setIsVisible }) {
     const warriorsTrainingCosts = warriors.map((warrior) => ({
         id: warrior.id,
         name: warrior.name,
-        crop: Math.floor(warrior.trainingCost.crop * Math.pow(1.2, warrior.level)),
+        crops: Math.floor(warrior.trainingCost.crops * Math.pow(1.2, warrior.level)),
         iron: Math.floor(warrior.trainingCost.iron * Math.pow(1.2, warrior.level)),
         trainingTime: warrior.trainingTime
     }));
@@ -220,11 +220,11 @@ export default function AcademyModal({ isVisible, setIsVisible }) {
     const totalCost = warriorsTrainingCosts.reduce(
         (acc, warrior) => {
             const count = selectedWarriors[warrior.id] || 0; // Get selected amount (default 0)
-            acc.crop += warrior.crop * count;
+            acc.crops += warrior.crops * count;
             acc.iron += warrior.iron * count;
             return acc;
         },
-        { crop: 0, iron: 0 }
+        { crops: 0, iron: 0 }
     );
 
     const formatDuration = (seconds) => {
@@ -326,7 +326,7 @@ export default function AcademyModal({ isVisible, setIsVisible }) {
                                                                         {/* Crop Cost */}
                                                                         <View style={styles.resourcesTrainingCostContainer}>
                                                                             <Image source={require("../../assets/images/cropIcon.png")} style={{ height: 25, width: 25 }} />
-                                                                            <Text style={styles.resourceCost}>{warriorCost?.crop}</Text>
+                                                                            <Text style={styles.resourceCost}>{warriorCost?.crops}</Text>
                                                                         </View>
 
                                                                         {/* Iron Cost */}
@@ -368,7 +368,7 @@ export default function AcademyModal({ isVisible, setIsVisible }) {
                                         <View style={{ flexDirection: 'row', marginTop: 2 }}>
                                             <View style={{ flexDirection: 'row', marginHorizontal: 10 }}>
                                                 <Image source={require("../../assets/images/cropIcon.png")} style={{ height: 20, width: 20 }} />
-                                                <Text style={styles.resourceTrainingCost}>{totalCost.crop}</Text>
+                                                <Text style={styles.resourceTrainingCost}>{totalCost.crops}</Text>
                                             </View>
 
                                             <View style={{ flexDirection: 'row' }}>
@@ -421,7 +421,7 @@ export default function AcademyModal({ isVisible, setIsVisible }) {
                                                 onPress={() => {
                                                     if (!isUpgrading && canUpgrade) {
                                                         // Pass the current warehouse location to preserve it during upgrade.
-                                                        updateBuildings("Academy", academy.location, resources, gainExperience);
+                                                        updateBuildings(academy, academy.location);
                                                         setIsVisible(false);
                                                     }
                                                 }}
@@ -503,7 +503,7 @@ export default function AcademyModal({ isVisible, setIsVisible }) {
                                                             source={require("../../assets/images/cropIcon.png")}
                                                             style={{ height: 25, width: 25 }}
                                                         />
-                                                        <Text style={styles.resourceCost}>{upgradeWarriorCost.crop}</Text>
+                                                        <Text style={styles.resourceCost}>{upgradeWarriorCost.crops}</Text>
                                                     </View>
                                                     <View style={styles.resourcesCostContainer}>
                                                         <Image

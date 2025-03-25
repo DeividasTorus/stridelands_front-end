@@ -55,7 +55,7 @@ const buildingIconsBlack = {
 
 export default function VillageScreen() {
   // Get building state and update function from VillageContext.
-  const { buildings, updateBuildings, } = useContext(VillageContext);
+  const { buildings, updateBuildings, allBuildingTypes } = useContext(VillageContext);
   // Get resources and XP function from GameContext.
   const { resources, gainExperience, } = useContext(GameContext);
 
@@ -70,24 +70,29 @@ export default function VillageScreen() {
   };
 
   // Function to build a new building.
-  const buildBuilding = (buildingName) => {
+  // ✅ Updated build logic
+  const buildBuilding = (building) => {
     if (selectedBuildSpot) {
-      updateBuildings(buildingName, selectedBuildSpot, resources, gainExperience);
+      updateBuildings(building, selectedBuildSpot);
       setBuildMenuVisible(false);
     }
   };
 
-  // Filter available buildings (those not yet built).
-  const availableBuildings = buildings
-    .filter(b => {
-      // If finishTime exists and it's still in the future, exclude it.
-      if (b.finishTime && new Date() < new Date(b.finishTime)) {
-        return false;
-      }
-      // Otherwise, include it only if it's not built.
-      return !b.built;
-    })
-    .map(b => b.name);
+
+  // Get built buildings
+  // ✅ Get built buildings only
+  const builtBuildings = buildings.filter((b) => b.built === true);
+  const builtNames = builtBuildings.map((b) => b.name.toLowerCase());
+
+  const townHall = builtBuildings.find((b) => b.name === "Town Hall");
+  const townHallLevel = townHall?.level || 0;
+
+  // ✅ Show all buildings, exclude only already built ones
+  const availableToBuild = Array.isArray(allBuildingTypes)
+  ? allBuildingTypes.filter((b) => !builtNames.includes(b.name.toLowerCase()))
+  : [];
+
+
 
   // Spots where buildings can be placed.
   const buildSpots = [
@@ -103,8 +108,7 @@ export default function VillageScreen() {
     { name: "Spot10", top: "40%", left: "20%" },
     { name: "Spot11", top: "54%", left: "70%" },
   ];
-
-
+  
   return (
     <View style={styles.container}>
       <View style={styles.centeredContainer}>
@@ -115,14 +119,33 @@ export default function VillageScreen() {
           {/* Global Countdown Overlay */}
           <View style={{ position: 'absolute', top: 10, left: 10, zIndex: 9999 }}>
             {buildings
-              .filter(b => new Date() < new Date(b.finishTime))
+              .filter(b => b.finishTime && new Date() < new Date(b.finishTime))
               .map(b => (
                 <View key={b.name} style={styles.countDownContainer}>
-                  <View style={{ backgroundColor: "#DCC7A1", padding: 5, borderRadius: 50, borderWidth: 4, borderColor: "rgba(107, 57, 0, 0.90)", }}>
+                  <View
+                    style={{
+                      backgroundColor: "#DCC7A1",
+                      padding: 5,
+                      borderRadius: 50,
+                      borderWidth: 4,
+                      borderColor: "rgba(107, 57, 0, 0.90)",
+                    }}
+                  >
                     <Image style={{ width: 35, height: 35 }} source={buildingIcons[b.name]} />
                   </View>
                   <View style={{ marginTop: 15, marginLeft: -6 }}>
-                    <View style={{ backgroundColor: "#DCC7A1", paddingRight: 15, paddingLeft: 2, borderTopWidth: 4, borderBottomWidth: 4, borderRightWidth: 4, borderColor: "rgba(107, 57, 0, 0.80)", borderBottomRightRadius: 12 }}>
+                    <View
+                      style={{
+                        backgroundColor: "#DCC7A1",
+                        paddingRight: 15,
+                        paddingLeft: 2,
+                        borderTopWidth: 4,
+                        borderBottomWidth: 4,
+                        borderRightWidth: 4,
+                        borderColor: "rgba(107, 57, 0, 0.80)",
+                        borderBottomRightRadius: 12,
+                      }}
+                    >
                       <Countdown finishTime={b.finishTime} />
                     </View>
                   </View>
@@ -170,17 +193,13 @@ export default function VillageScreen() {
           <Text style={styles.modalTitle}>Choose Building</Text>
           <View style={{ alignItems: "center" }}>
             <ScrollView style={styles.scrollContainer}>
-              {availableBuildings.map((buildingName, index) => {
-                const building = buildings.find((b) => b.name === buildingName);
-                if (!building) return null;
-                const townHall = buildings.find((b) => b.name === "Town Hall");
-                const canBuild =
-                  townHall && townHall.level >= building.requiredTownHallLevel;
+              {availableToBuild.map((building, index) => {
+                const canBuild = townHallLevel >= building.requiredTownHallLevel;
                 return (
                   <View key={index} style={styles.buildOptionContainer}>
                     <TouchableOpacity
                       style={[styles.buildOption, !canBuild && styles.disabledOption]}
-                      onPress={() => canBuild && buildBuilding(building.name)}
+                      onPress={() => canBuild && buildBuilding(building)}
                       disabled={!canBuild}
                     >
                       <View style={styles.buildingInfo}>
@@ -194,46 +213,22 @@ export default function VillageScreen() {
                             <Text style={styles.costsText}>Costs</Text>
                             <View style={{ flexDirection: "row" }}>
                               <View style={styles.resourcesCostContainer}>
-                                <Image
-                                  source={require("../../assets/images/woodIcon.png")}
-                                  style={{ height: 30, width: 30 }}
-                                />
-                                <Text style={styles.resourceCost}>
-{building?.resourceCost?.wood ?? 0}
-                                </Text>
+                                <Image source={require("../../assets/images/woodIcon.png")} style={{ height: 30, width: 30 }} />
+                                <Text style={styles.resourceCost}>{building.resourceCost?.wood ?? 0}</Text>
                               </View>
                               <View style={styles.resourcesCostContainer}>
-                                <Image
-                                  source={require("../../assets/images/bricksIcon.png")}
-                                  style={{ height: 30, width: 30 }}
-                                />
-                                <Text style={styles.resourceCost}>
-                                  {building.resourceCost.clay}
-                                </Text>
+                                <Image source={require("../../assets/images/bricksIcon.png")} style={{ height: 30, width: 30 }} />
+                                <Text style={styles.resourceCost}>{building.resourceCost?.clay ?? 0}</Text>
                               </View>
                               <View style={styles.resourcesCostContainer}>
-                                <Image
-                                  source={require("../../assets/images/ironIcon.png")}
-                                  style={{ height: 30, width: 30 }}
-                                />
-                                <Text style={styles.resourceCost}>
-                                  {building.resourceCost.iron}
-                                </Text>
+                                <Image source={require("../../assets/images/ironIcon.png")} style={{ height: 30, width: 30 }} />
+                                <Text style={styles.resourceCost}>{building.resourceCost?.iron ?? 0}</Text>
                               </View>
                             </View>
                           </View>
                         ) : (
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Image
-                              source={require("../../assets/images/lockIcon.png")}
-                              style={{ height: 30, width: 30 }}
-                            />
+                          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                            <Image source={require("../../assets/images/lockIcon.png")} style={{ height: 30, width: 30 }} />
                             <Text style={styles.requirementText}>
                               Requires Town Hall Level {building.requiredTownHallLevel}
                             </Text>

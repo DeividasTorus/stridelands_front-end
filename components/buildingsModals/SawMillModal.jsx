@@ -27,9 +27,9 @@ export default function SawMillModal({ isVisible, setIsVisible }) {
         : { wood: 0, clay: 0, iron: 0 }; // Default values to prevent errors
 
     const isUpgrading =
-    sawMill.underConstruction &&
-    sawMill.finishTime &&
-    sawMill.finishTime > Date.now();
+        sawMill.underConstruction &&
+        sawMill.finishTime &&
+        sawMill.finishTime > Date.now();
 
     // Find Town Hall
     const townHall = buildings.find((b) => b.name === "Town Hall");
@@ -71,7 +71,7 @@ export default function SawMillModal({ isVisible, setIsVisible }) {
                         <Image source={require("../../assets/images/sawMill.png")} style={styles.cropsImage} />
                         <View style={styles.storageContainer}>
                             <Text style={styles.storageText}>Production Rate</Text>
-                            <View style={{flexDirection: 'row'}}>
+                            <View style={{ flexDirection: 'row' }}>
                                 <Text style={styles.storageNumbers}>50 steps / {sawMill.productionRate}</Text>
                                 <Image source={require("../../assets/images/woodIcon.png")} style={styles.resourceIcon} />
                             </View>
@@ -117,7 +117,7 @@ export default function SawMillModal({ isVisible, setIsVisible }) {
                                             onPress={() => {
                                                 if (!isUpgrading && canUpgrade) {
                                                     // Pass the current warehouse location to preserve it during upgrade.
-                                                    updateBuildings("Sawmill", sawMill.location, resources, gainExperience);
+                                                    updateBuildings(sawMill, sawMill.location);
                                                     setIsVisible(false);
                                                 }
                                             }}

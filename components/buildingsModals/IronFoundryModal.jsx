@@ -27,9 +27,9 @@ export default function IronFoundryModal({ isVisible, setIsVisible }) {
         : { wood: 0, clay: 0, iron: 0 }; // Default values to prevent errors
 
     const isUpgrading =
-    ironFoundry.underConstruction &&
-    ironFoundry.finishTime &&
-    ironFoundry.finishTime > Date.now();
+        ironFoundry.underConstruction &&
+        ironFoundry.finishTime &&
+        ironFoundry.finishTime > Date.now();
 
     // Find Town Hall
     const townHall = buildings.find((b) => b.name === "Town Hall");
@@ -71,7 +71,7 @@ export default function IronFoundryModal({ isVisible, setIsVisible }) {
                         <Image source={require("../../assets/images/ironFoundry.png")} style={styles.cropsImage} />
                         <View style={styles.storageContainer}>
                             <Text style={styles.storageText}>Production Rate</Text>
-                            <View style={{flexDirection: 'row'}}>
+                            <View style={{ flexDirection: 'row' }}>
                                 <Text style={styles.storageNumbers}>50 steps / {ironFoundry.productionRate}</Text>
                                 <Image source={require("../../assets/images/ironIcon.png")} style={styles.resourceIcon} />
                             </View>
@@ -117,7 +117,7 @@ export default function IronFoundryModal({ isVisible, setIsVisible }) {
                                             onPress={() => {
                                                 if (!isUpgrading && canUpgrade) {
                                                     // Pass the current warehouse location to preserve it during upgrade.
-                                                    updateBuildings("Iron Foundry", ironFoundry.location, resources, gainExperience);
+                                                    updateBuildings(ironFoundry, ironFoundry.location);
                                                     setIsVisible(false);
                                                 }
                                             }}

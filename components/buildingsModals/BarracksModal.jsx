@@ -141,7 +141,7 @@ export default function BarracksModal({ isVisible, setIsVisible }) {
                                             onPress={() => {
                                                 if (!isUpgrading && canUpgrade) {
                                                     // Pass the current warehouse location to preserve it during upgrade.
-                                                    updateBuildings("Barracks", barracks.location, resources, gainExperience);
+                                                    updateBuildings(barracks, barracks.location);
                                                     setIsVisible(false);
                                                 }
                                             }}

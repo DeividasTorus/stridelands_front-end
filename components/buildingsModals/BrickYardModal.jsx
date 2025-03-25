@@ -118,7 +118,7 @@ export default function BrickYardModal({ isVisible, setIsVisible }) {
                                             onPress={() => {
                                                 if (!isUpgrading && canUpgrade) {
                                                     // Pass the current warehouse location to preserve it during upgrade.
-                                                    updateBuildings("Brickyard", brickYard.location, resources, gainExperience);
+                                                    updateBuildings(brickYard, brickYard.location);
                                                     setIsVisible(false);
                                                 }
                                             }}

@@ -8,7 +8,7 @@ import Countdown from "../gameComponents/Countdown";
 
 export default function ScoutingPostModal({ isVisible, setIsVisible }) {
     // Get building data and update function from VillageContext
-    const { buildings, updateBuildings, buildMaterialsMax } = useContext(VillageContext);
+    const { buildings, updateBuildings } = useContext(VillageContext);
     // Get resources, storage capacity values, and XP function from GameContext
     const { resources, buildMaterialsTotal, gainExperience, startStepCounting, isTracking, currentSteps, finishTime } = useContext(GameContext);
     const { user } = useContext(UserContext);
@@ -19,7 +19,7 @@ export default function ScoutingPostModal({ isVisible, setIsVisible }) {
 
     const grainMill = buildings.find((b) => b.name === "Grain Mill");
     if (!grainMill) return null;
-    
+
     const brickYard = buildings.find((b) => b.name === "Brickyard");
     if (!brickYard) return null;
 
@@ -189,7 +189,7 @@ export default function ScoutingPostModal({ isVisible, setIsVisible }) {
                                             onPress={() => {
                                                 if (!isUpgrading && canUpgrade) {
                                                     // Pass the current warehouse location to preserve it during upgrade.
-                                                    updateBuildings("Scouting Post", scoutingPost.location, resources, gainExperience);
+                                                    updateBuildings(scoutingPost, scoutingPost.location);
                                                     setIsVisible(false);
                                                 }
                                             }}

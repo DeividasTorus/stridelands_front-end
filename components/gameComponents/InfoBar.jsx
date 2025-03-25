@@ -235,7 +235,7 @@ export default function InfoBar() {
           </View>
           <View style={styles.resourceItem}>
             <Image source={require("../../assets/images/cropIcon.png")} style={styles.resourceIcon} />
-            <Text style={styles.resourceText}>{resources.crop}</Text>
+            <Text style={styles.resourceText}>{resources.crops}</Text>
           </View>
         </View>
       </View>

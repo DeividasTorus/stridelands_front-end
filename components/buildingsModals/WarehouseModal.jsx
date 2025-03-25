@@ -115,7 +115,7 @@ export default function WarehouseModal({ isVisible, setIsVisible }) {
                     />
                     <Text style={styles.resourceName}>Crops:</Text>
                   </View>
-                  <Text style={styles.resourceText}>{resources.crop}</Text>
+                  <Text style={styles.resourceText}>{resources.crops}</Text>
                 </View>
               </View>
             </View>
@@ -160,7 +160,7 @@ export default function WarehouseModal({ isVisible, setIsVisible }) {
                       onPress={() => {
                         if (!isUpgrading && canUpgrade) {
                           // Pass the current warehouse location to preserve it during upgrade.
-                          updateBuildings("Warehouse", warehouse.location, resources, gainExperience);
+                          updateBuildings(warehouse, warehouse.location);
                           setIsVisible(false);
                         }
                       }}

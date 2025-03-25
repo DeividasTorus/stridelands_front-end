@@ -13,9 +13,10 @@ export const UserProvider = ({ children }) => {
   if (Platform.OS === "android") {
     API_URL = "http://10.0.2.2:3000"; // Android Emulator
   } else if (Platform.OS === "ios") {
-    API_URL = "http:localhost:3000"; // iOS real device (use local network IP)
+    // API_URL = "http://192.168.1.107:3000"; // iOS phone with atomis ip, http://localhost:3000 to ios emulator
+    API_URL = "http://192.168.0.75:3000";
   } else {
-    API_URL = "http://192.168.1.100:5000"; // Replace with your actual server IP
+    API_URL = "http://192.168.0.75:3000"; // Replace with your real IP
   }
 
   // ✅ Load user session from backend on app startup
@@ -65,7 +66,6 @@ export const UserProvider = ({ children }) => {
 
       const data = await response.json();
       console.log("✅ Registration Success:", data);
-      setUser(data.user); // Automatically log in the user after registration
 
       return { success: true, user: data.user };
     } catch (error) {
